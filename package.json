@@ -1,44 +1,88 @@
 {
-  "name": "client",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "dependencies": {
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-redux": "^7.2.0",
-    "react-scripts": "3.4.1"
-  },
-  "devDependencies": {
-    "@reduxjs/toolkit": "^1.2.5",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "@types/jest": "^24.0.0",
-    "@types/node": "^12.0.0",
-    "@types/react": "^16.9.0",
-    "@types/react-dom": "^16.9.0",
-    "@types/react-redux": "^7.1.7",
-    "typescript": "~3.8.2"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+	"name": "client",
+	"version": "0.1.0",
+	"main": "public/electron.ts",
+	"description": "Afeka - Auto Installation - Final Degree Project (FDP)",
+	"private": true,
+	"scripts": {
+		"start": "react-scripts start",
+		"build": "react-scripts build",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject",
+		"dev": "concurrently -c \"blue.bold,magenta.bold\" -n \"REACT,ELECTRON\" \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+		"postinstall": "electron-builder install-app-deps",
+		"preelectron-pack": "yarn build",
+		"electron-pack": "electron-builder build -w",
+		"pack": "electron-builder --dir -w"
+	},
+	"dependencies": {
+		"electron-is-dev": "^1.2.0",
+		"react": "^16.13.1",
+		"react-dom": "^16.13.1",
+		"react-redux": "^7.2.0",
+		"react-scripts": "3.4.1"
+	},
+	"devDependencies": {
+		"@reduxjs/toolkit": "^1.2.5",
+		"@testing-library/jest-dom": "^4.2.4",
+		"@testing-library/react": "^9.3.2",
+		"@testing-library/user-event": "^7.1.2",
+		"@types/jest": "^24.0.0",
+		"@types/node": "^12.0.0",
+		"@types/react": "^16.9.0",
+		"@types/react-dom": "^16.9.0",
+		"@types/react-redux": "^7.1.7",
+		"concurrently": "^5.1.0",
+		"devtron": "^1.4.0",
+		"electron": "^8.2.3",
+		"electron-builder": "^22.5.1",
+		"electron-debug": "^3.0.1",
+		"electron-devtools-installer": "^3.0.0",
+		"typescript": "~3.8.2",
+		"wait-on": "^4.0.2"
+	},
+	"eslintConfig": {
+		"extends": "react-app"
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"author": {
+		"name": "Afeka",
+		"email": "afeka@afeka.ac.il",
+		"url": "https://www.afeka.ac.il"
+	},
+	"build": {
+		"appId": "il.ac.afeka.autoInstallation",
+		"productName": "AutoInstallation",
+		"copyright": "Copyright © 2020 ${author}",
+		"icon": "public/icon.ico",
+		"files": [
+			"build/**/*",
+			"node_modules/**/*"
+		],
+		"win": {
+			"target": [
+				{
+					"target": "portable",
+					"arch": [
+						"x64",
+						"ia32"
+					]
+				}
+			]
+		},
+		"directories": {
+			"buildResources": "public"
+		}
+	}
 }
