@@ -1,8 +1,9 @@
 {
 	"name": "client",
 	"version": "0.1.0",
-	"main": "public/electron.ts",
-	"description": "Afeka - Auto Installation - Final Degree Project (FDP)",
+	"main": "src/electron/main.ts",
+	"homepage": "./",
+	"description": "Afeka - Auto Software Installation System- Final Degree Project (FDP)",
 	"private": true,
 	"scripts": {
 		"start": "react-scripts start",
@@ -11,9 +12,10 @@
 		"eject": "react-scripts eject",
 		"dev": "concurrently -c \"blue.bold,magenta.bold\" -n \"REACT,ELECTRON\" \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
 		"postinstall": "electron-builder install-app-deps",
+		"preelectron-dist": "yarn build",
+		"electron-dist": "electron-builder -c.extraMetadata.main=build/electron/main.ts -w",
 		"preelectron-pack": "yarn build",
-		"electron-pack": "electron-builder build -w",
-		"pack": "electron-builder --dir -w"
+		"electron-pack": "electron-builder -c.extraMetadata.main=build/electron/main.ts --dir -w"
 	},
 	"dependencies": {
 		"electron-is-dev": "^1.2.0",
@@ -62,14 +64,21 @@
 		"url": "https://www.afeka.ac.il"
 	},
 	"build": {
-		"appId": "il.ac.afeka.autoInstallation",
-		"productName": "AutoInstallation",
+		"appId": "il.ac.afeka.autoSoftwareInstallationSystem",
+		"productName": "Afeka - Auto Software Installation System",
 		"copyright": "Copyright © 2020 ${author}",
-		"icon": "public/icon.ico",
+		"icon": "public/favicon.ico",
 		"files": [
 			"build/**/*",
-			"node_modules/**/*"
+			{
+				"from": "src/electron",
+				"to": "build/electron",
+				"filter": [
+					"**/*"
+				]
+			}
 		],
+		"extraFiles":[],
 		"win": {
 			"target": [
 				{
