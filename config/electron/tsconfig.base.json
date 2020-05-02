@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es2017",
+		"lib": ["es2019", "dom", "dom.iterable"],
+		"strict": true,
+		"allowJs": true,
+		"noUnusedLocals": true,
+		"baseUrl": "../../",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"stripInternal": true,
+		"outDir": "../../public/electron",
+		"moduleResolution": "node"
+	},
+	"files": ["../../src/electron/main.ts"]
+}
