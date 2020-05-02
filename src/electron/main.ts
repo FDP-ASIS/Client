@@ -58,9 +58,8 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-	//TODO need to check if devtron is load
 	//add electron dev tool
-	if (isDev) require('devtron').install();
+	if (isDev) console.log(require('devtron').install());
 
 	//make the mainWindow as a singleton
 	if (mainWindow === null && BrowserWindow.getAllWindows().length === 0) {
