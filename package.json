@@ -10,20 +10,22 @@
 		"start": "react-scripts start",
 		"build": "react-scripts build",
 		"test": "react-scripts test",
-		"electron-clean-build": "rimraf ./public/electron/",
-		"preelectron-build-prod": "yarn run electron-clean-build",
-		"electron-build-dev": "tsc -p ./config/electron/tsconfig.development.json -w",
-		"electron-build-prod": "tsc -p ./config/electron/tsconfig.production.json",
-		"electron-dev": "concurrently -c \"yellow.bold,cyan.bold\" -n \"WATCH,DEV\" \"yarn run electron-build-dev\" \"wait-on http://localhost:3000 && electron .\"",
-		"dev": "concurrently -c \"blue.bold,magenta.bold\" -n \"REACT,ELECTRON\" \"BROWSER=none yarn start\" \"yarn run electron-dev\"",
+		"electron-clean:build": "rimraf ./public/electron/",
+		"preelectron-build:prod": "yarn run electron-clean:build",
+		"electron-build:dev": "tsc -p ./config/electron/tsconfig.development.json -w",
+		"electron-build:prod": "tsc -p ./config/electron/tsconfig.production.json",
+		"electron-start:dev": "concurrently -c \"yellow.bold,cyan.bold\" -n \"WATCH,DEV\" \"yarn run electron-build:dev\" \"wait-on http://localhost:3000 && electron .\"",
+		"dev": "concurrently -c \"blue.bold,magenta.bold\" -n \"REACT,ELECTRON\" \"BROWSER=none yarn start\" \"yarn run electron-start:dev\"",
 		"preelectron-dist": "yarn run project-build",
 		"electron-dist": "electron-builder -c.extraMetadata.main=build/electron/main.js -w",
 		"preelectron-pack": "yarn run project-build",
 		"electron-pack": "electron-builder -c.extraMetadata.main=build/electron/main.js --dir -w",
-		"project-build": "yarn run electron-build-prod && yarn build"
+		"project-build": "yarn run electron-build:prod && yarn build",
+		"release": "yarn run electron-dist"
 	},
 	"dependencies": {
 		"electron-is-dev": "^1.2.0",
+		"electron-log": "^4.1.2",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1",
 		"react-redux": "^7.2.0",
@@ -34,6 +36,7 @@
 		"@testing-library/jest-dom": "^4.2.4",
 		"@testing-library/react": "^9.3.2",
 		"@testing-library/user-event": "^7.1.2",
+		"@types/electron-devtools-installer": "^2.2.0",
 		"@types/jest": "^24.0.0",
 		"@types/node": "^12.0.0",
 		"@types/react": "^16.9.0",
@@ -45,12 +48,30 @@
 		"electron-builder": "^22.5.1",
 		"electron-debug": "^3.0.1",
 		"electron-devtools-installer": "^3.0.0",
+		"electron-reload": "^1.5.0",
+		"husky": "^4.2.5",
+		"lint-staged": "^10.2.2",
+		"prettier": "^2.0.5",
 		"rimraf": "^3.0.2",
 		"typescript": "~3.8.2",
 		"wait-on": "^4.0.2"
 	},
 	"eslintConfig": {
 		"extends": "react-app"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"{src,test,mocks}/**/*.{json,css,scss,md}": [
+			"prettier --config ./.prettierrc --write"
+		],
+		"{src,test,mocks}/**/*.{js,ts,tsx}": [
+			"prettier --config ./.prettierrc --write",
+			"eslint --ext=jsx,js,ts,tsx --fix src"
+		]
 	},
 	"browserslist": {
 		"production": [
@@ -89,6 +110,7 @@
 			]
 		},
 		"directories": {
+			"output": "release",
 			"buildResources": "public"
 		}
 	}

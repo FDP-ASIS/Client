@@ -1,12 +1,16 @@
-import { app, BrowserWindow } from "electron";
-import path from "path";
-import isDev from "electron-is-dev";
+import { app, BrowserWindow } from 'electron';
+import path from 'path';
+import isDev from 'electron-is-dev';
+import * as INSTALLER_EXTENSTION from 'electron-devtools-installer';
+
+declare function require(moduleName: string): any;
 
 let mainWindow: BrowserWindow | null = null;
 
 if (isDev) {
-	const debug = require("electron-debug");
-	debug({ devToolsMode: "detach" });
+	const debug = require('electron-debug');
+	debug({ devToolsMode: 'detach' });
+	require('electron-reload')(__dirname);
 }
 
 function createWindow() {
@@ -21,47 +25,44 @@ function createWindow() {
 	});
 	mainWindow.setMenuBarVisibility(false);
 	mainWindow.loadURL(
-		isDev
-			? "http://localhost:3000"
-			: `file://${path.join(__dirname, "../build/index.html")}`
+		isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../index.html')}`
 	);
 
 	if (isDev) {
-		const {
-			default: installExtension,
-			REACT_DEVELOPER_TOOLS,
-			REDUX_DEVTOOLS,
-		} = require("electron-devtools-installer");
+		let installExtension: typeof INSTALLER_EXTENSTION = require('electron-devtools-installer');
 
 		app.whenReady().then(() => {
-			installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS])
-				.then((name: string) => {
-					console.log(`Added Extension:  ${name}`);
-				})
-				.catch((err: string) => console.log("An error occurred: ", err));
+			installExtension
+				.default([installExtension.REACT_DEVELOPER_TOOLS, installExtension.REDUX_DEVTOOLS])
+				.then((name) => console.log(`Added Extension:  ${name}`))
+				.catch((err) => console.log('An error occurred: ', err));
 		});
 
 		// Open the DevTools.
 		// BrowserWindow.addDevToolsExtension('<location to your react chrome extension>');
 		// mainWindow.webContents.openDevTools();
 	} else {
-		const log = require("electron-log");
-		console.log = log.log;
+		const log = require('electron-log');
+		Object.assign(console, log.functions);
+		// console.log = log.log;
 	}
-	mainWindow.on("closed", () => (mainWindow = null));
+	mainWindow.on('closed', () => (mainWindow = null));
 }
 
-app.on("ready", createWindow);
+app.on('ready', createWindow);
 
-app.on("window-all-closed", () => {
-	if (process.platform !== "darwin") {
+app.on('window-all-closed', () => {
+	if (process.platform !== 'darwin') {
 		app.quit();
 	}
 });
 
-app.on("activate", () => {
-	if (isDev) require("devtron").install();
+app.on('activate', () => {
+	//TODO need to check if devtron is load
+	//add electron dev tool
+	if (isDev) require('devtron').install();
 
+	//make the mainWindow as a singleton
 	if (mainWindow === null && BrowserWindow.getAllWindows().length === 0) {
 		createWindow();
 	}

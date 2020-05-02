@@ -11,7 +11,8 @@
 		"experimentalDecorators": true,
 		"stripInternal": true,
 		"outDir": "../../public/electron",
-		"moduleResolution": "node"
+		"moduleResolution": "node",
+		"esModuleInterop": true
 	},
 	"files": ["../../src/electron/main.ts"]
 }
