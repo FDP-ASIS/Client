@@ -1,25 +1,33 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import isDev from 'electron-is-dev';
 import * as INSTALLER_EXTENSTION from 'electron-devtools-installer';
+import { IpcChannelInterface } from './IPC/main/IpcChannelInterface';
+import ipcs from './IPC/root';
 
 declare function require(moduleName: string): any;
 
 if (isDev) {
 	const debug = require('electron-debug');
 	debug({ devToolsMode: 'detach' });
-	require('electron-reload')(__dirname);
+	require('electron-reload')(__dirname, {
+		electron: path.join(__dirname, '..', '..', 'node_modules', '.bin', 'electron'),
+		hardResetMethod: 'exit',
+		forceHardReset: true,
+	});
 }
+
 class Main {
 	static readonly WIDTH = 900;
 	static readonly HEIGHT = 680;
 
 	private mainWindow: BrowserWindow | null = null;
 
-	public init() {
+	public init(ipcChannels: IpcChannelInterface[]) {
 		app.on('ready', this.createWindow);
 		app.on('window-all-closed', this.onWindowAllClosed);
 		app.on('activate', this.onActivate);
+		this.registerIpcChannels(ipcChannels);
 	}
 
 	private onWindowAllClosed() {
@@ -55,7 +63,6 @@ class Main {
 		this.mainWindow.loadURL(
 			isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../index.html')}`
 		);
-
 		if (isDev) {
 			let installExtension: typeof INSTALLER_EXTENSTION = require('electron-devtools-installer');
 
@@ -79,6 +86,12 @@ class Main {
 		}
 		this.mainWindow.on('closed', () => (this.mainWindow = null));
 	}
+
+	private registerIpcChannels(ipcChannels: IpcChannelInterface[]) {
+		ipcChannels.forEach((channel) =>
+			ipcMain.on(channel.getName(), (event, request) => channel.handle(event, request))
+		);
+	}
 }
 
-new Main().init();
+new Main().init(ipcs);

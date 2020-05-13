@@ -12,7 +12,8 @@
 		"stripInternal": true,
 		"outDir": "../../public/electron",
 		"moduleResolution": "node",
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"skipLibCheck": true
 	},
 	"include": ["../../src/electron"]
 }

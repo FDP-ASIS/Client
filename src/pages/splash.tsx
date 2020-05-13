@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import ReactLoading from 'react-loading';
 
 import logo from '../assets/logo.png';
+
+import { checkAuthIPC } from '../utils/auth';
 // import { connect } from 'react-redux'
 
 const Center = styled.div`
@@ -21,8 +23,16 @@ const Article = styled('div')`
 	display: flex;
 	place-content: center;
 `;
-
+// Splash.ch
 export default class Splash extends Component {
+	componentDidMount() {
+		this.checkAuth();
+	}
+
+	private checkAuth = async () => {
+		checkAuthIPC().then(console.log).catch(console.log);
+	};
+
 	render() {
 		return (
 			<Center>
