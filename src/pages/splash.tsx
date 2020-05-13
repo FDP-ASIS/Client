@@ -28,7 +28,13 @@ export default class Splash extends Component {
 			<Center>
 				<img src={logo} alt="logo" style={{ marginBottom: '30%' }} />
 				<Article>
-					<ReactLoading type="bubbles" color="white" height={'20%'} width={'20%'} />
+					<ReactLoading
+						type="bubbles"
+						color="white"
+						height={'20%'}
+						width={'20%'}
+						delay={2000}
+					/>
 				</Article>
 			</Center>
 		);
