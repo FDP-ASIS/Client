@@ -12,9 +12,13 @@ type LoginProps = {
 };
 
 const Container = styled.div`
-	width: 100%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	/* width: 100%;
 	height: 100%;
-	padding: 18% 30% 0% 30%;
+	padding: 18% 30% 0% 30%;*/
 	text-align: center;
 `;
 
@@ -68,10 +72,10 @@ export default class Login extends Component<{}, LoginProps> {
 						</Col>
 					</Row>
 					<Row gutter={[20, 16]} className={Classes.TEXT_LARGE}>
-						<Col span={7} style={{ textAlign: 'end' }}>
+						<Col offset={3} span={5} style={{ textAlign: 'end' }}>
 							Username:
 						</Col>
-						<Col span={16}>
+						<Col span={12}>
 							<InputGroup
 								disabled={disabled}
 								placeholder="Enter your username"
@@ -79,11 +83,10 @@ export default class Login extends Component<{}, LoginProps> {
 								fill={true}
 							/>
 						</Col>
-
-						<Col span={7} style={{ textAlign: 'end' }}>
+						<Col offset={3} span={5} style={{ textAlign: 'end' }}>
 							Password:
 						</Col>
-						<Col span={16}>
+						<Col span={12}>
 							<InputGroup
 								disabled={disabled}
 								placeholder="Enter your password"
