@@ -4,10 +4,12 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import ReactLoading from 'react-loading';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import logo from '../assets/logo.png';
 
-import { checkAuthIPC } from '../utils/auth';
+import { getAuthToken } from '../utils/auth';
+import { RoutesPath } from '../routers/routesPath';
 // import { connect } from 'react-redux'
 
 const Center = styled.div`
@@ -24,13 +26,26 @@ const Article = styled('div')`
 	place-content: center;
 `;
 
-export default class Splash extends Component {
+class Splash extends Component<RouteComponentProps> {
+	private readonly SLASH_TIME = 5000;
+
 	componentDidMount() {
 		this.checkAuth();
 	}
 
+	private navTo(route: RoutesPath, withTimeOut: boolean): void {
+		setTimeout(
+			() => {
+				this.props.history.push(route);
+			},
+			withTimeOut ? this.SLASH_TIME : 0
+		);
+	}
+
 	private checkAuth = async () => {
-		checkAuthIPC().then(console.log).catch(console.log);
+		getAuthToken()
+			.then(() => console.log('aaaaaaaaaaaaaaaa'))
+			.catch(() => this.navTo(RoutesPath.Login, true));
 	};
 
 	render() {
@@ -58,5 +73,7 @@ export default class Splash extends Component {
 // const mapDispatchToProps = {
 
 // }
+
+export default withRouter(Splash);
 
 // export default connect(mapStateToProps, mapDispatchToProps)(Splash)

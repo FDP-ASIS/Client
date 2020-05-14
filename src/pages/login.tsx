@@ -86,7 +86,7 @@ export default class Login extends Component<{}, LoginProps> {
 						<Col span={16}>
 							<InputGroup
 								disabled={disabled}
-								placeholder="Enter your password..."
+								placeholder="Enter your password"
 								rightElement={lockButton}
 								type={showPassword ? 'text' : 'password'}
 							/>

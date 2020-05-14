@@ -1,3 +1,4 @@
 export enum AuthChannels {
-	CheckAuthToken = 'CheckAuthToken',
+	GetAuthToken = 'GetAuthToken',
+	SetAuthToken = 'SetAuthToken',
 }
