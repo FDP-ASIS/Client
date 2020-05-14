@@ -1,19 +1,18 @@
 import React from 'react';
 import { store } from '../redux/store';
 import { Provider } from 'react-redux';
-
-import Splash from '../pages/splash';
+import { Routes } from '../routers/routes';
 
 import './App.css';
 
-function App(): React.ReactElement {
+const App: React.SFC = () => {
 	return (
 		<React.StrictMode>
 			<Provider store={store}>
-				<Splash />
+				<Routes />
 			</Provider>
 		</React.StrictMode>
 	);
-}
+};
 
 export default App;

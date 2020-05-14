@@ -23,7 +23,7 @@ const Article = styled('div')`
 	display: flex;
 	place-content: center;
 `;
-// Splash.ch
+
 export default class Splash extends Component {
 	componentDidMount() {
 		this.checkAuth();
