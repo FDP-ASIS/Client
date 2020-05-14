@@ -4,6 +4,8 @@ import { PublicRoute } from './public';
 import Splash from '../pages/splash';
 import Login from '../pages/login';
 import { RoutesPath } from './routesPath';
+import { PrivateRoute } from './private';
+import Dashboard from '../pages/dashboard';
 
 export const Routes: React.SFC = () => {
 	return (
@@ -16,6 +18,8 @@ export const Routes: React.SFC = () => {
 				/>
 				<PublicRoute path={RoutesPath.Splash} component={Splash} restricted />
 				<PublicRoute path={RoutesPath.Login} component={Login} restricted />
+				<PrivateRoute path={RoutesPath.Dashboard} component={Dashboard} />
+
 				{/*<PrivateRoute path="/logout" component={Logout} /> */}
 				{/* <Route component={Error} /> */}
 			</Switch>

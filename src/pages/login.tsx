@@ -4,6 +4,8 @@ import { Row, Col } from 'antd';
 import { Classes, InputGroup, Tooltip, Button, Intent, Alert, Toaster } from '@blueprintjs/core';
 import logo from '../assets/logo.png';
 import { logMeIn, setAuthToken } from '../utils/auth';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { RoutesPath } from '../routers/routesPath';
 
 type LoginProps = {
 	username: string;
@@ -34,7 +36,7 @@ const Footer = styled.footer`
 	text-align: center;
 `;
 
-export default class Login extends Component<{}, LoginProps> {
+class Login extends Component<RouteComponentProps, LoginProps> {
 	state: LoginProps = {
 		username: '',
 		password: '',
@@ -47,7 +49,11 @@ export default class Login extends Component<{}, LoginProps> {
 		if (!username || !password) this.handleErrorOpen();
 		else {
 			logMeIn(username, password)
-				.then((token) => setAuthToken(token))
+				.then((token) =>
+					setAuthToken(token).then(() => {
+						this.props.history.push(RoutesPath.Dashboard);
+					})
+				)
 				.catch((reason) => this.addToast(reason));
 		}
 	};
@@ -153,3 +159,5 @@ export default class Login extends Component<{}, LoginProps> {
 		);
 	}
 }
+
+export default withRouter(Login);

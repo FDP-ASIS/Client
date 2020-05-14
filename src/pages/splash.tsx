@@ -33,7 +33,7 @@ class Splash extends Component<RouteComponentProps> {
 		this.checkAuth();
 	}
 
-	private navTo(route: RoutesPath, withTimeOut: boolean): void {
+	private navTo(route: RoutesPath, withTimeOut = false): void {
 		setTimeout(
 			() => {
 				this.props.history.push(route);
@@ -45,7 +45,9 @@ class Splash extends Component<RouteComponentProps> {
 	private checkAuth = async () => {
 		getAuthToken()
 			.then((token) => {
-				logMeInWithToken(token).catch(() => this.navTo(RoutesPath.Login, false));
+				logMeInWithToken(token)
+					.then(() => this.navTo(RoutesPath.Dashboard))
+					.catch(() => this.navTo(RoutesPath.Login, false));
 			})
 			.catch(() => this.navTo(RoutesPath.Login, true));
 	};

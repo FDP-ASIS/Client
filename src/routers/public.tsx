@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, Redirect, RouteComponentProps, RouteProps } from 'react-router-dom';
-
+import { RoutesPath } from './routesPath';
 // import { useAuthState } from '../../context/AuthContext';
 
 type PublicRouteProps = {
@@ -13,6 +13,7 @@ export const PublicRoute: React.SFC<PublicRouteProps> = ({
 	restricted = false,
 	...rest
 }) => {
+	//TODO get auth from redux
 	const isAuthenticated = false;
 	if (!Component) throw Error('Missing components - Public route');
 	return (
@@ -22,7 +23,7 @@ export const PublicRoute: React.SFC<PublicRouteProps> = ({
 			{...rest}
 			render={(props: RouteComponentProps) =>
 				isAuthenticated && restricted ? (
-					<Redirect to="/dashboard" />
+					<Redirect to={RoutesPath.Dashboard} />
 				) : (
 					<Component {...props} />
 				)
