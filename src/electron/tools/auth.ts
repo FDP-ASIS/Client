@@ -6,7 +6,6 @@ export const getAuthTokenStore = (): string | null => {
 };
 
 export const setAuthTokenStore = (token: string): boolean => {
-	// TODO add implantation
+	sharedPreferences.set(AuthKeys.Token, token);
 	return true;
-	// sharedPreferences.get
 };

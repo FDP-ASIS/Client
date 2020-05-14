@@ -8,7 +8,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 import logo from '../assets/logo.png';
 
-import { getAuthToken } from '../utils/auth';
+import { getAuthToken, logMeInWithToken } from '../utils/auth';
 import { RoutesPath } from '../routers/routesPath';
 // import { connect } from 'react-redux'
 
@@ -44,7 +44,9 @@ class Splash extends Component<RouteComponentProps> {
 
 	private checkAuth = async () => {
 		getAuthToken()
-			.then(() => console.log('aaaaaaaaaaaaaaaa'))
+			.then((token) => {
+				logMeInWithToken(token).catch(() => this.navTo(RoutesPath.Login, false));
+			})
 			.catch(() => this.navTo(RoutesPath.Login, true));
 	};
 

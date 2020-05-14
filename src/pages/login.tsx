@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Row, Col } from 'antd';
-import { Classes, InputGroup, Tooltip, Button, Intent } from '@blueprintjs/core';
+import { Classes, InputGroup, Tooltip, Button, Intent, Alert, Toaster } from '@blueprintjs/core';
 import logo from '../assets/logo.png';
+import { logMeIn, setAuthToken } from '../utils/auth';
 
 type LoginProps = {
 	username: string;
 	password: string;
 	disabled: boolean;
+	isOpenError: boolean;
 	showPassword: boolean;
 };
 
@@ -16,16 +18,12 @@ const Container = styled.div`
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	/* width: 100%;
-	height: 100%;
-	padding: 18% 30% 0% 30%;*/
 	text-align: center;
 `;
 
 const Logo = styled.img<{ src: string }>`
 	src: ${(props) => props.src};
 	alt: 'logo';
-	max-width: 100%;
 `;
 
 const Footer = styled.footer`
@@ -42,14 +40,34 @@ export default class Login extends Component<{}, LoginProps> {
 		password: '',
 		disabled: false,
 		showPassword: false,
+		isOpenError: false,
 	};
 
-	private onSubmit = () => {};
+	private onSubmit = (username: string, password: string) => {
+		if (!username || !password) this.handleErrorOpen();
+		else {
+			logMeIn(username, password)
+				.then((token) => setAuthToken(token))
+				.catch((reason) => this.addToast(reason));
+		}
+	};
 
 	private handleLockClick = () => this.setState({ showPassword: !this.state.showPassword });
 
+	private handleErrorOpen = () => this.setState({ isOpenError: true });
+	private handleErrorClose = () => this.setState({ isOpenError: false });
+
+	private toaster!: Toaster;
+	private refHandlers = {
+		toaster: (ref: Toaster) => (this.toaster = ref),
+	};
+
+	private addToast = (reason: string) => {
+		this.toaster.show({ message: reason, intent: Intent.DANGER, icon: 'issue' });
+	};
+
 	render() {
-		const { showPassword, disabled } = this.state;
+		const { showPassword, disabled, username, password, isOpenError } = this.state;
 
 		const lockButton = (
 			<Tooltip content={`${showPassword ? 'Hide' : 'Show'} Password`} disabled={disabled}>
@@ -66,6 +84,21 @@ export default class Login extends Component<{}, LoginProps> {
 		return (
 			<>
 				<Container>
+					<Toaster
+						position="top"
+						canEscapeKeyClear={true}
+						maxToasts={1}
+						ref={this.refHandlers.toaster}
+					/>
+					<Alert
+						confirmButtonText="Okay"
+						isOpen={isOpenError}
+						onClose={this.handleErrorClose}
+					>
+						<p style={{ color: 'black' }}>
+							Oops, you forget to enter your username/password
+						</p>
+					</Alert>
 					<Row gutter={[8, 48]} align="middle">
 						<Col span={24}>
 							<Logo src={logo}></Logo>
@@ -77,6 +110,10 @@ export default class Login extends Component<{}, LoginProps> {
 						</Col>
 						<Col span={12}>
 							<InputGroup
+								value={username}
+								onChange={(event: React.FormEvent<HTMLInputElement>) =>
+									this.setState({ username: event.currentTarget.value })
+								}
 								disabled={disabled}
 								placeholder="Enter your username"
 								type="text"
@@ -88,6 +125,10 @@ export default class Login extends Component<{}, LoginProps> {
 						</Col>
 						<Col span={12}>
 							<InputGroup
+								value={password}
+								onChange={(event: React.FormEvent<HTMLInputElement>) =>
+									this.setState({ password: event.currentTarget.value })
+								}
 								disabled={disabled}
 								placeholder="Enter your password"
 								rightElement={lockButton}
@@ -102,7 +143,7 @@ export default class Login extends Component<{}, LoginProps> {
 								large={true}
 								intent={Intent.PRIMARY}
 								style={{ width: '150px' }}
-								onClick={this.onSubmit}
+								onClick={() => this.onSubmit(username, password)}
 							/>
 						</Col>
 					</Row>

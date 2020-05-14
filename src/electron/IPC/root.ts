@@ -1,9 +1,10 @@
 import { IpcChannelInterface } from './main/IpcChannelInterface';
 
-import { GetAuthTokenChannel } from './main/authChannel';
+import { GetAuthTokenChannel, SetAuthTokenChannel } from './main/authChannel';
 
-const ipcs: IpcChannelInterface[] = [];
+const ipcs: IpcChannelInterface<any>[] = [];
 
 ipcs.push(new GetAuthTokenChannel());
+ipcs.push(new SetAuthTokenChannel());
 
 export default ipcs;

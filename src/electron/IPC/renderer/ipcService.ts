@@ -4,7 +4,7 @@ import { IpcRequest } from '../../shared/IpcRequest';
 export class IpcService {
 	private ipcRenderer?: IpcRenderer;
 
-	public send<T>(channel: string, request: IpcRequest = {}): Promise<T> {
+	public send<T, P = {}>(channel: string, request: IpcRequest<P> = {}): Promise<T> {
 		// If the ipcRenderer is not available try to initialize it
 		if (!this.ipcRenderer) {
 			this.initializeIpcRenderer();

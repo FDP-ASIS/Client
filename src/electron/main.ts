@@ -4,6 +4,7 @@ import isDev from 'electron-is-dev';
 import * as INSTALLER_EXTENSTION from 'electron-devtools-installer';
 import { IpcChannelInterface } from './IPC/main/IpcChannelInterface';
 import ipcs from './IPC/root';
+import { sharedPreferences } from './store/store';
 
 declare function require(moduleName: string): any;
 
@@ -23,7 +24,7 @@ class Main {
 
 	private mainWindow: BrowserWindow | null = null;
 
-	public init(ipcChannels: IpcChannelInterface[]) {
+	public init(ipcChannels: IpcChannelInterface<any>[]) {
 		app.on('ready', this.createWindow);
 		app.on('window-all-closed', this.onWindowAllClosed);
 		app.on('activate', this.onActivate);
@@ -31,6 +32,9 @@ class Main {
 	}
 
 	private onWindowAllClosed() {
+		if (isDev) {
+			sharedPreferences.clear();
+		}
 		if (process.platform !== 'darwin') {
 			app.quit();
 		}
@@ -87,7 +91,7 @@ class Main {
 		this.mainWindow.on('closed', () => (this.mainWindow = null));
 	}
 
-	private registerIpcChannels(ipcChannels: IpcChannelInterface[]) {
+	private registerIpcChannels(ipcChannels: IpcChannelInterface<any>[]) {
 		ipcChannels.forEach((channel) =>
 			ipcMain.on(channel.getName(), (event, request) => channel.handle(event, request))
 		);
