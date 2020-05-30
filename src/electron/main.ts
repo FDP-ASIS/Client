@@ -86,7 +86,7 @@ class Main {
 		} else {
 			const log = require('electron-log');
 			Object.assign(console, log.functions);
-			// console.log = log.log;
+			console.log = log.log;
 		}
 		this.mainWindow.on('closed', () => (this.mainWindow = null));
 	}
