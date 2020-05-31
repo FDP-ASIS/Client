@@ -31,14 +31,19 @@ export default class Dashboard extends React.PureComponent<{}, ICheckboxExampleS
 		return (
 			<Center>
 				<Checkbox
-					label="Course 1"
+					label="10806 - תכנות ותיכון מונחה עצמים"
 					checked={this.state.checked}
 					large={true}
+					alignIndicator={Alignment.RIGHT}
 					onChange={(event) => this.setState({ checked: !this.state.checked })}
 				/>
-				<Checkbox label="Course 2" large={true} />
-				<Checkbox label="Course 3" large={true} />
-				<Checkbox label="Course 4" large={true} />
+				<Checkbox
+					label="10805 - מבנה נתונים ואלגורתמים"
+					large={true}
+					alignIndicator={Alignment.RIGHT}
+				/>
+				<Checkbox label="Course 3" large={true} alignIndicator={Alignment.RIGHT} />
+				<Checkbox label="Course 4" large={true} alignIndicator={Alignment.RIGHT} />
 
 				<Button
 					text="Start"
