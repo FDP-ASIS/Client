@@ -3,9 +3,12 @@ import styled from 'styled-components';
 import { Row, Col } from 'antd';
 import { Classes, InputGroup, Tooltip, Button, Intent, Alert, Toaster } from '@blueprintjs/core';
 import logo from '../assets/logo.png';
-import { logMeIn, setAuthToken } from '../utils/auth';
+import { logMeIn } from '../utils/auth';
+import { setUser } from '../redux/reducers/user';
+import { connect } from 'react-redux';
+import { User } from '../models/user';
+import { AppDispatch } from '../redux/store';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import { RoutesPath } from '../routers/routesPath';
 
 type LoginProps = {
 	username: string;
@@ -13,7 +16,12 @@ type LoginProps = {
 	disabled: boolean;
 	isOpenError: boolean;
 	showPassword: boolean;
+	wiggling: boolean;
 };
+
+interface LoginComponentProps {
+	actions: { savePerson: (person: User) => ReturnType<AppDispatch> };
+}
 
 const Container = styled.div`
 	position: absolute;
@@ -36,25 +44,33 @@ const Footer = styled.footer`
 	text-align: center;
 `;
 
-class Login extends Component<RouteComponentProps, LoginProps> {
+class Login extends Component<RouteComponentProps & LoginComponentProps, LoginProps> {
 	state: LoginProps = {
 		username: '',
 		password: '',
 		disabled: false,
 		showPassword: false,
 		isOpenError: false,
+		wiggling: false,
 	};
+
+	private readonly LOGIN_INTERVALE = 2000;
+
+	private wiggleTimeoutId: number | undefined;
+	private loginTimeoutId: number | undefined;
 
 	private onSubmit = (username: string, password: string) => {
 		if (!username || !password) this.handleErrorOpen();
 		else {
-			logMeIn(username, password)
-				.then((token) =>
-					setAuthToken(token).then(() => {
-						this.props.history.push(RoutesPath.Dashboard);
-					})
-				)
-				.catch((reason) => this.addToast(reason));
+			this.beginWiggling();
+			this.setState({ disabled: !this.state.disabled });
+			clearTimeout(this.loginTimeoutId);
+			this.loginTimeoutId = setTimeout(() => {
+				logMeIn({ username, password })
+					.then((user) => this.props.actions.savePerson(user))
+					.catch(() => this.addToast('Username or password is invalid'))
+					.finally(() => this.setState({ disabled: !this.state.disabled }));
+			}, this.LOGIN_INTERVALE);
 		}
 	};
 
@@ -70,6 +86,17 @@ class Login extends Component<RouteComponentProps, LoginProps> {
 
 	private addToast = (reason: string) => {
 		this.toaster.show({ message: reason, intent: Intent.DANGER, icon: 'issue' });
+	};
+
+	public componentWillUnmount() {
+		clearTimeout(this.wiggleTimeoutId);
+		clearTimeout(this.loginTimeoutId);
+	}
+
+	private beginWiggling = () => {
+		clearTimeout(this.wiggleTimeoutId);
+		this.setState({ wiggling: true });
+		this.wiggleTimeoutId = setTimeout(() => this.setState({ wiggling: false }), 300);
 	};
 
 	render() {
@@ -145,8 +172,11 @@ class Login extends Component<RouteComponentProps, LoginProps> {
 					<Row gutter={[8, 48]} align="middle" style={{ marginTop: '30px' }}>
 						<Col span={24}>
 							<Button
+								className={this.state.wiggling ? 'docs-wiggle' : ''}
 								text="Login"
 								large={true}
+								loading={disabled}
+								icon={'log-in'}
 								intent={Intent.PRIMARY}
 								style={{ width: '150px' }}
 								onClick={() => this.onSubmit(username, password)}
@@ -160,4 +190,12 @@ class Login extends Component<RouteComponentProps, LoginProps> {
 	}
 }
 
-export default withRouter(Login);
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+	return {
+		actions: {
+			savePerson: (user: User) => dispatch(setUser(user)),
+		},
+	};
+};
+
+export default withRouter(connect(null, mapDispatchToProps)(Login));

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Route, Redirect, RouteComponentProps, RouteProps } from 'react-router-dom';
 import { RoutesPath } from './routesPath';
-
+import { useSelector } from 'react-redux';
+import { selectUser } from '../redux/reducers/user';
 // import { useAuthState } from '../../context/AuthContext';
 
 type PrivateRouteProps = {
@@ -9,8 +10,7 @@ type PrivateRouteProps = {
 } & RouteProps;
 
 export const PrivateRoute: React.SFC<PrivateRouteProps> = ({ component: Component, ...rest }) => {
-	//TODO get auth from redux
-	const isAuthenticated = true;
+	const isAuthenticated = useSelector(selectUser) != null;
 
 	return (
 		// Show the component only when the user is logged in
