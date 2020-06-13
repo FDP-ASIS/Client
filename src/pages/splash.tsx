@@ -1,6 +1,3 @@
-// TODO add search for session
-// TODO add request to auth the user
-
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import ReactLoading from 'react-loading';
@@ -10,7 +7,10 @@ import logo from '../assets/logo.png';
 
 import { getAuthToken, logMeInWithToken } from '../utils/auth';
 import { RoutesPath } from '../routers/routesPath';
-// import { connect } from 'react-redux'
+import { connect } from 'react-redux';
+import { User } from '../models/user';
+import { AppDispatch } from '../redux/store';
+import { setUser } from '../redux/reducers/user';
 
 const Center = styled.div`
 	position: absolute;
@@ -26,7 +26,11 @@ const Article = styled('div')`
 	place-content: center;
 `;
 
-class Splash extends Component<RouteComponentProps> {
+interface LoginComponentProps {
+	actions: { savePerson: (person: User) => ReturnType<AppDispatch> };
+}
+
+class Splash extends Component<RouteComponentProps & LoginComponentProps> {
 	private readonly SLASH_TIME = 5000;
 
 	componentDidMount() {
@@ -36,7 +40,7 @@ class Splash extends Component<RouteComponentProps> {
 	private navTo(route: RoutesPath, withTimeOut = false): void {
 		setTimeout(
 			() => {
-				this.props.history.push(route);
+				this.props.history.replace(route);
 			},
 			withTimeOut ? this.SLASH_TIME : 0
 		);
@@ -46,7 +50,10 @@ class Splash extends Component<RouteComponentProps> {
 		getAuthToken()
 			.then((token) => {
 				logMeInWithToken(token)
-					.then(() => this.navTo(RoutesPath.Dashboard))
+					.then((user) => {
+						this.props.actions.savePerson(user);
+						this.navTo(RoutesPath.Dashboard);
+					})
 					.catch(() => this.navTo(RoutesPath.Login, false));
 			})
 			.catch(() => this.navTo(RoutesPath.Login, true));
@@ -70,14 +77,12 @@ class Splash extends Component<RouteComponentProps> {
 	}
 }
 
-// const mapStateToProps = (state) => ({
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+	return {
+		actions: {
+			savePerson: (user: User) => dispatch(setUser(user)),
+		},
+	};
+};
 
-// })
-
-// const mapDispatchToProps = {
-
-// }
-
-export default withRouter(Splash);
-
-// export default connect(mapStateToProps, mapDispatchToProps)(Splash)
+export default withRouter(connect(null, mapDispatchToProps)(Splash));

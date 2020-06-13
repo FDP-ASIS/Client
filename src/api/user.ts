@@ -1,4 +1,4 @@
-import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Api } from './config/api';
 import { Credentials, User } from '../models/user';
 
@@ -22,40 +22,45 @@ export class UserApi extends Api {
 		}));
 
 		this.login = this.login.bind(this);
-		this.userRegister = this.userRegister.bind(this);
-		this.getAllUsers = this.getAllUsers.bind(this);
-		this.getById = this.getById.bind(this);
+		this.loginWithToken = this.loginWithToken.bind(this);
+		// this.userRegister = this.userRegister.bind(this);
+		// this.getAllUsers = this.getAllUsers.bind(this);
+		// this.getById = this.getById.bind(this);
 	}
 
 	public login<R = UserWithToken>(credentials: Credentials): Promise<R> {
 		return this.post<R, Credentials>('auth/login', credentials).then(this.success);
 	}
 
-	public userRegister(user: User): Promise<number> {
-		return this.post<number, User>('https://www.domain.com/register', user)
-			.then(this.success)
-			.catch((error: AxiosError<Error>) => {
-				throw error;
-			});
+	public loginWithToken<R = User>(token: string): Promise<R> {
+		return this.post<R, string>('auth', token).then(this.success);
 	}
 
-	public async getAllUsers(): Promise<User[]> {
-		try {
-			const res: AxiosResponse<User[]> = await this.get<User, AxiosResponse<User[]>>(
-				'https://www.domain.com/register'
-			);
+	// public userRegister(user: User): Promise<number> {
+	// 	return this.post<number, User>('https://www.domain.com/register', user)
+	// 		.then(this.success)
+	// 		.catch((error: AxiosError<Error>) => {
+	// 			throw error;
+	// 		});
+	// }
 
-			return this.success(res);
-		} catch (error) {
-			throw error;
-		}
-	}
+	// public async getAllUsers(): Promise<User[]> {
+	// 	try {
+	// 		const res: AxiosResponse<User[]> = await this.get<User, AxiosResponse<User[]>>(
+	// 			'https://www.domain.com/register'
+	// 		);
 
-	public getById(id: number): Promise<User> {
-		return this.get<User, AxiosResponse<User>>(`https://www.domain.com/users/${id}`).then(
-			this.success
-		);
-	}
+	// 		return this.success(res);
+	// 	} catch (error) {
+	// 		throw error;
+	// 	}
+	// }
+
+	// public getById(id: number): Promise<User> {
+	// 	return this.get<User, AxiosResponse<User>>(`https://www.domain.com/users/${id}`).then(
+	// 		this.success
+	// 	);
+	// }
 }
 
 export const userApi = new UserApi();

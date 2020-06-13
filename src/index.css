@@ -34,3 +34,22 @@ body {
 code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+@keyframes docs-wiggle-rotate {
+	0% {
+		transform: rotate(0);
+	}
+	25% {
+		transform: rotate(-3deg);
+	}
+	75% {
+		transform: rotate(3deg);
+	}
+	100% {
+		transform: rotate(0);
+	}
+}
+
+.docs-wiggle {
+	animation: docs-wiggle-rotate 100ms cubic-bezier(0.4, 1, 0.75, 0.9) infinite;
+}

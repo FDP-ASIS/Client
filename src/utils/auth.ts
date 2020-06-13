@@ -18,12 +18,10 @@ export const getAuthToken = async (): Promise<string> => {
 	return Promise.reject('Token not found');
 };
 
-export const logMeInWithToken = async (token: string): Promise<string> => {
-	//TODO send auth request with token to server
-	return new Promise((resolve, reject) => {
-		resolve('TOKEN');
-		// reject('SERVER ERROR');
-	});
+export const logMeInWithToken = async (token: string): Promise<User> => {
+	return userApi
+		.loginWithToken(token)
+		.then((user) => (user ? Promise.resolve(user) : Promise.reject()));
 };
 
 const setAuthToken = async (token: string): Promise<void> => {

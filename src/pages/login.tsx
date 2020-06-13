@@ -16,6 +16,7 @@ type LoginProps = {
 	disabled: boolean;
 	isOpenError: boolean;
 	showPassword: boolean;
+	wiggling: boolean;
 };
 
 interface LoginComponentProps {
@@ -50,18 +51,24 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 		disabled: false,
 		showPassword: false,
 		isOpenError: false,
+		wiggling: false,
 	};
 
 	private readonly LOGIN_INTERVALE = 2000;
 
+	private wiggleTimeoutId: number | undefined;
+	private loginTimeoutId: number | undefined;
+
 	private onSubmit = (username: string, password: string) => {
 		if (!username || !password) this.handleErrorOpen();
 		else {
+			this.beginWiggling();
 			this.setState({ disabled: !this.state.disabled });
-			setTimeout(() => {
+			clearTimeout(this.loginTimeoutId);
+			this.loginTimeoutId = setTimeout(() => {
 				logMeIn({ username, password })
 					.then((user) => this.props.actions.savePerson(user))
-					.catch((reason) => this.addToast('Username or password is invalid'))
+					.catch(() => this.addToast('Username or password is invalid'))
 					.finally(() => this.setState({ disabled: !this.state.disabled }));
 			}, this.LOGIN_INTERVALE);
 		}
@@ -79,6 +86,17 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 
 	private addToast = (reason: string) => {
 		this.toaster.show({ message: reason, intent: Intent.DANGER, icon: 'issue' });
+	};
+
+	public componentWillUnmount() {
+		clearTimeout(this.wiggleTimeoutId);
+		clearTimeout(this.loginTimeoutId);
+	}
+
+	private beginWiggling = () => {
+		clearTimeout(this.wiggleTimeoutId);
+		this.setState({ wiggling: true });
+		this.wiggleTimeoutId = setTimeout(() => this.setState({ wiggling: false }), 300);
 	};
 
 	render() {
@@ -154,9 +172,11 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 					<Row gutter={[8, 48]} align="middle" style={{ marginTop: '30px' }}>
 						<Col span={24}>
 							<Button
+								className={this.state.wiggling ? 'docs-wiggle' : ''}
 								text="Login"
 								large={true}
-								disabled={disabled}
+								loading={disabled}
+								icon={'log-in'}
 								intent={Intent.PRIMARY}
 								style={{ width: '150px' }}
 								onClick={() => this.onSubmit(username, password)}
