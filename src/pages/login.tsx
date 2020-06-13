@@ -3,9 +3,12 @@ import styled from 'styled-components';
 import { Row, Col } from 'antd';
 import { Classes, InputGroup, Tooltip, Button, Intent, Alert, Toaster } from '@blueprintjs/core';
 import logo from '../assets/logo.png';
-import { logMeIn, setAuthToken } from '../utils/auth';
+import { logMeIn } from '../utils/auth';
+import { setUser } from '../redux/reducers/user';
+import { connect } from 'react-redux';
+import { User } from '../models/user';
+import { AppDispatch } from '../redux/store';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import { RoutesPath } from '../routers/routesPath';
 
 type LoginProps = {
 	username: string;
@@ -14,6 +17,10 @@ type LoginProps = {
 	isOpenError: boolean;
 	showPassword: boolean;
 };
+
+interface LoginComponentProps {
+	actions: { savePerson: (person: User) => ReturnType<AppDispatch> };
+}
 
 const Container = styled.div`
 	position: absolute;
@@ -36,7 +43,7 @@ const Footer = styled.footer`
 	text-align: center;
 `;
 
-class Login extends Component<RouteComponentProps, LoginProps> {
+class Login extends Component<RouteComponentProps & LoginComponentProps, LoginProps> {
 	state: LoginProps = {
 		username: '',
 		password: '',
@@ -45,16 +52,18 @@ class Login extends Component<RouteComponentProps, LoginProps> {
 		isOpenError: false,
 	};
 
+	private readonly LOGIN_INTERVALE = 2000;
+
 	private onSubmit = (username: string, password: string) => {
 		if (!username || !password) this.handleErrorOpen();
 		else {
-			logMeIn(username, password)
-				.then((token) =>
-					setAuthToken(token).then(() => {
-						this.props.history.push(RoutesPath.Dashboard);
-					})
-				)
-				.catch((reason) => this.addToast(reason));
+			this.setState({ disabled: !this.state.disabled });
+			setTimeout(() => {
+				logMeIn({ username, password })
+					.then((user) => this.props.actions.savePerson(user))
+					.catch((reason) => this.addToast('Username or password is invalid'))
+					.finally(() => this.setState({ disabled: !this.state.disabled }));
+			}, this.LOGIN_INTERVALE);
 		}
 	};
 
@@ -147,6 +156,7 @@ class Login extends Component<RouteComponentProps, LoginProps> {
 							<Button
 								text="Login"
 								large={true}
+								disabled={disabled}
 								intent={Intent.PRIMARY}
 								style={{ width: '150px' }}
 								onClick={() => this.onSubmit(username, password)}
@@ -160,4 +170,12 @@ class Login extends Component<RouteComponentProps, LoginProps> {
 	}
 }
 
-export default withRouter(Login);
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+	return {
+		actions: {
+			savePerson: (user: User) => dispatch(setUser(user)),
+		},
+	};
+};
+
+export default withRouter(connect(null, mapDispatchToProps)(Login));

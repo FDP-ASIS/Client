@@ -1,6 +1,8 @@
 import React from 'react';
 import { Route, Redirect, RouteComponentProps, RouteProps } from 'react-router-dom';
 import { RoutesPath } from './routesPath';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../redux/reducers/user';
 // import { useAuthState } from '../../context/AuthContext';
 
 type PublicRouteProps = {
@@ -13,8 +15,8 @@ export const PublicRoute: React.SFC<PublicRouteProps> = ({
 	restricted = false,
 	...rest
 }) => {
-	//TODO get auth from redux
-	const isAuthenticated = false;
+	const isAuthenticated = useSelector(selectUser) != null;
+
 	if (!Component) throw Error('Missing components - Public route');
 	return (
 		// restricted = false meaning public route
