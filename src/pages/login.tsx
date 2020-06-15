@@ -67,7 +67,9 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 			clearTimeout(this.loginTimeoutId);
 			this.loginTimeoutId = setTimeout(() => {
 				logMeIn({ username, password })
-					.then((user) => this.props.actions.savePerson(user))
+					.then((user) => {
+						this.props.actions.savePerson(user);
+					})
 					.catch(() => this.addToast('Username or password is invalid'))
 					.finally(() => this.setState({ disabled: !this.state.disabled }));
 			}, this.LOGIN_INTERVALE);
@@ -75,17 +77,14 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 	};
 
 	private handleLockClick = () => this.setState({ showPassword: !this.state.showPassword });
-
 	private handleErrorOpen = () => this.setState({ isOpenError: true });
 	private handleErrorClose = () => this.setState({ isOpenError: false });
 
-	private toaster!: Toaster;
-	private refHandlers = {
-		toaster: (ref: Toaster) => (this.toaster = ref),
-	};
+	private toaster: Toaster | undefined;
 
 	private addToast = (reason: string) => {
-		this.toaster.show({ message: reason, intent: Intent.DANGER, icon: 'issue' });
+		if (this.toaster)
+			this.toaster.show({ message: reason, intent: Intent.DANGER, icon: 'issue' });
 	};
 
 	public componentWillUnmount() {
@@ -121,7 +120,7 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 						position="top"
 						canEscapeKeyClear={true}
 						maxToasts={1}
-						ref={this.refHandlers.toaster}
+						ref={(ref: Toaster) => (this.toaster = ref)}
 					/>
 					<Alert
 						confirmButtonText="Okay"

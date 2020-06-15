@@ -8,6 +8,9 @@ interface UserWithToken {
 }
 
 export class UserApi extends Api {
+	private readonly LOGIN = 'auth/login';
+	private readonly AUTH_WITH_TOKEN = 'auth';
+
 	public constructor(config?: AxiosRequestConfig) {
 		super(config);
 
@@ -29,11 +32,11 @@ export class UserApi extends Api {
 	}
 
 	public login<R = UserWithToken>(credentials: Credentials): Promise<R> {
-		return this.post<R, Credentials>('auth/login', credentials).then(this.success);
+		return this.post<R, Credentials>(this.LOGIN, credentials);
 	}
 
 	public loginWithToken<R = User>(token: string): Promise<R> {
-		return this.post<R, string>('auth', token).then(this.success);
+		return this.post<R, string>(this.AUTH_WITH_TOKEN, token);
 	}
 
 	// public userRegister(user: User): Promise<number> {

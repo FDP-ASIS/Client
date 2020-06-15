@@ -5,7 +5,7 @@ import Splash from '../pages/splash';
 import Login from '../pages/login';
 import { RoutesPath } from './routesPath';
 import { PrivateRoute } from './private';
-import Dashboard from '../pages/dashboard';
+import { Dashboard } from '../pages/dashboard';
 
 export const Routes: React.SFC = () => {
 	return (

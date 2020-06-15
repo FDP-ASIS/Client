@@ -1,18 +1,17 @@
-import React, { Component } from 'react';
-// import { connect } from 'react-redux'
+import React, { FunctionComponent } from 'react';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../redux/reducers/user';
+import { Role } from '../models/user';
 
-export default class Dashboard extends Component {
-	render() {
-		return <div>Dashboard</div>;
+export const Dashboard: FunctionComponent<{}> = () => {
+	const user = useSelector(selectUser);
+	switch (user?.role) {
+		case Role.STUDENT:
+			break;
+		case Role.LECTURER:
+			break;
+		case Role.ADMIN:
+			break;
 	}
-}
-
-// const mapStateToProps = (state) => ({
-
-// })
-
-// const mapDispatchToProps = {
-
-// }
-
-// export default connect(mapStateToProps, mapDispatchToProps)Ddashboard)
+	return <div></div>;
+};
