@@ -32,13 +32,18 @@ interface LoginComponentProps {
 
 class Splash extends Component<RouteComponentProps & LoginComponentProps> {
 	private readonly SLASH_TIME = 5000;
+	private splashTimeoutId: number | undefined;
 
 	componentDidMount() {
 		this.checkAuth();
 	}
 
+	public componentWillUnmount() {
+		clearTimeout(this.splashTimeoutId);
+	}
+
 	private navTo(route: RoutesPath, withTimeOut = false): void {
-		setTimeout(
+		this.splashTimeoutId = setTimeout(
 			() => {
 				this.props.history.replace(route);
 			},
