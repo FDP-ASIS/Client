@@ -3,4 +3,5 @@ export enum RoutesPath {
 	Splash = '/splash',
 	Login = '/login',
 	Dashboard = '/dashboard',
+	Profile = '/profile',
 }

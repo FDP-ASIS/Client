@@ -9,6 +9,8 @@ import { connect } from 'react-redux';
 import { User } from '../models/user';
 import { AppDispatch } from '../redux/store';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { Footer } from '../components/Footer/Footer';
+import Strings from '../utils/strings/index';
 
 type LoginProps = {
 	username: string;
@@ -34,14 +36,6 @@ const Container = styled.div`
 const Logo = styled.img<{ src: string }>`
 	src: ${(props) => props.src};
 	alt: 'logo';
-`;
-
-const Footer = styled.footer`
-	position: fixed;
-	bottom: 0;
-	width: 100%;
-	display: block;
-	text-align: center;
 `;
 
 class Login extends Component<RouteComponentProps & LoginComponentProps, LoginProps> {
@@ -70,7 +64,7 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 					.then((user) => {
 						this.props.actions.savePerson(user);
 					})
-					.catch(() => this.addToast('Username or password is invalid'))
+					.catch(() => this.addToast(Strings.LOGIN_FAILED))
 					.finally(() => this.setState({ disabled: !this.state.disabled }));
 			}, this.LOGIN_INTERVALE);
 		}
@@ -102,7 +96,10 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 		const { showPassword, disabled, username, password, isOpenError } = this.state;
 
 		const lockButton = (
-			<Tooltip content={`${showPassword ? 'Hide' : 'Show'} Password`} disabled={disabled}>
+			<Tooltip
+				content={`${showPassword ? Strings.HIDE : Strings.SHOW} ${Strings.PASSWORD}`}
+				disabled={disabled}
+			>
 				<Button
 					disabled={disabled}
 					icon={showPassword ? 'unlock' : 'lock'}
@@ -123,13 +120,11 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 						ref={(ref: Toaster) => (this.toaster = ref)}
 					/>
 					<Alert
-						confirmButtonText="Okay"
+						confirmButtonText={Strings.OK}
 						isOpen={isOpenError}
 						onClose={this.handleErrorClose}
 					>
-						<p style={{ color: 'black' }}>
-							Oops, you forget to enter your username/password
-						</p>
+						<p style={{ color: 'black' }}>{Strings.USERNAME_OR_PASSWORD_NOT_ENTERED}</p>
 					</Alert>
 					<Row gutter={[8, 48]} align="middle">
 						<Col span={24}>
@@ -138,7 +133,7 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 					</Row>
 					<Row gutter={[20, 16]} className={Classes.TEXT_LARGE}>
 						<Col offset={3} span={5} style={{ textAlign: 'end' }}>
-							Username:
+							{Strings.USERNAME}:
 						</Col>
 						<Col span={12}>
 							<InputGroup
@@ -147,13 +142,13 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 									this.setState({ username: event.currentTarget.value })
 								}
 								disabled={disabled}
-								placeholder="Enter your username"
+								placeholder={Strings.ENTER_USERNAME}
 								type="text"
 								fill={true}
 							/>
 						</Col>
 						<Col offset={3} span={5} style={{ textAlign: 'end' }}>
-							Password:
+							{Strings.PASSWORD}:
 						</Col>
 						<Col span={12}>
 							<InputGroup
@@ -162,7 +157,7 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 									this.setState({ password: event.currentTarget.value })
 								}
 								disabled={disabled}
-								placeholder="Enter your password"
+								placeholder={Strings.ENTER_PASSWORD}
 								rightElement={lockButton}
 								type={showPassword ? 'text' : 'password'}
 							/>
@@ -172,7 +167,7 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 						<Col span={24}>
 							<Button
 								className={this.state.wiggling ? 'docs-wiggle' : ''}
-								text="Login"
+								text={Strings.LOGIN}
 								large={true}
 								loading={disabled}
 								icon={'log-in'}
@@ -183,7 +178,7 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 						</Col>
 					</Row>
 				</Container>
-				<Footer> &copy; Copyright 2020 All rights reserved.</Footer>
+				<Footer />
 			</>
 		);
 	}
