@@ -19,7 +19,7 @@ const english: Strings = {
 	USERS: 'Users',
 	COURSES: 'Courses',
 	DEPARTMENTS: 'Departments',
-	ASSIGN_TO_COURSE: 'Assign to course',
+	ENROLL_TO_COURSE: 'Assign to course',
 };
 
 export default english;

@@ -10,4 +10,5 @@ export enum RoutesPath {
 	Users = 'users',
 	Courses = 'courses',
 	Departments = 'departments',
+	EnrollToCourse = 'enroll',
 }

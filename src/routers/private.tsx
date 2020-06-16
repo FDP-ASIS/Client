@@ -3,14 +3,20 @@ import { Route, Redirect, RouteComponentProps, RouteProps } from 'react-router-d
 import { RoutesPath } from './routesPath';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../redux/reducers/user';
-// import { useAuthState } from '../../context/AuthContext';
+import { Role } from '../models/user';
 
 type PrivateRouteProps = {
 	component: React.ComponentType;
+	onlyRole?: Role[];
 } & RouteProps;
 
-export const PrivateRoute: React.SFC<PrivateRouteProps> = ({ component: Component, ...rest }) => {
-	const isAuthenticated = useSelector(selectUser) != null;
+export const PrivateRoute: React.SFC<PrivateRouteProps> = ({
+	component: Component,
+	onlyRole,
+	...rest
+}) => {
+	const user = useSelector(selectUser);
+	const isAuthenticated = user != null && (onlyRole ? onlyRole.includes(user.role) : true);
 
 	return (
 		// Show the component only when the user is logged in

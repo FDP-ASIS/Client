@@ -19,7 +19,7 @@ export interface Strings {
 	USERS: string;
 	COURSES: string;
 	DEPARTMENTS: string;
-	ASSIGN_TO_COURSE: string;
+	ENROLL_TO_COURSE: string;
 }
 
 enum Languages {

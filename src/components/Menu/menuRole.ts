@@ -9,8 +9,8 @@ const studentMenus: MenuTabProps[] = [
 		link: RoutesPath.MyCourses,
 	},
 	{
-		name: Strings.ASSIGN_TO_COURSE,
-		link: RoutesPath.MyCourses,
+		name: Strings.ENROLL_TO_COURSE,
+		link: RoutesPath.EnrollToCourse,
 	},
 ];
 
