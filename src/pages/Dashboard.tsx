@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux';
 import { selectUser } from '../redux/reducers/user';
 import { Col, Row } from 'antd';
 import styled from 'styled-components';
-import { Menu } from '../components/menu';
+import { Menu } from '../components/Menu';
+import { CurrentPage } from '../components/CurrentPage/CurrentPage';
 
 const FillAllPage = styled.div`
 	position: relative;
@@ -19,7 +20,9 @@ export const Dashboard: FunctionComponent<{}> = () => {
 				<Col span={6}>
 					<Menu user={user!} />
 				</Col>
-				<Col span={18}>Page</Col>
+				<Col span={18}>
+					<CurrentPage />
+				</Col>
 			</Row>
 		</FillAllPage>
 	);

@@ -1,11 +1,11 @@
 import React from 'react';
 import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { PublicRoute } from './public';
-import Splash from '../pages/splash';
-import Login from '../pages/login';
+import Splash from '../pages/Splash';
+import Login from '../pages/Login';
 import { RoutesPath } from './routesPath';
 import { PrivateRoute } from './private';
-import { Dashboard } from '../pages/dashboard';
+import { Dashboard } from '../pages/Dashboard';
 
 export const Routes: React.SFC = () => {
 	return (
