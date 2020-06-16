@@ -64,10 +64,16 @@ export const Menu: FunctionComponent<MenuProps> = (props) => {
 					<H5Color>{helloTo(props.user.name)}</H5Color>
 				</Hello>
 				{menu.map((menuTabProps) => {
-					return <MenuTab name={menuTabProps.name} link={menuTabProps.link} />;
+					return (
+						<MenuTab
+							name={menuTabProps.name}
+							link={menuTabProps.link}
+							icon={menuTabProps.icon}
+						/>
+					);
 				})}
-				<MenuTab name={Strings.PROFILE} link={RoutesPath.Profile} />
-				<MenuTab name={Strings.ABOUT_US} link={RoutesPath.AboutUs} />
+				<MenuTab name={Strings.PROFILE} link={RoutesPath.Profile} icon="user" />
+				<MenuTab name={Strings.ABOUT_US} link={RoutesPath.AboutUs} icon={'code'} />
 				<MenuTab
 					name={Strings.LOGOUT}
 					link={RoutesPath.Logout}

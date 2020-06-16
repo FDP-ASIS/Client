@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useState } from 'react';
 import { RoutesPath } from '../../routers/routesPath';
 import { NavLink, RouteProps, useLocation, useHistory } from 'react-router-dom';
-import { AnchorButton, Intent, Alert, IconName } from '@blueprintjs/core';
+import { AnchorButton, Intent, Alert, IconName, Alignment } from '@blueprintjs/core';
 import Strings from '../../utils/strings/index';
 
 export interface MenuTabProps {
@@ -24,7 +24,14 @@ export const MenuTab: FunctionComponent<RouteProps & MenuTabProps> = (props) => 
 	if (props.onclickPopUp === undefined)
 		return (
 			<NavLink to={url} activeClassName="active">
-				<AnchorButton intent={Intent.NONE} fill={true} active={location.startsWith(url)}>
+				<AnchorButton
+					alignText={Alignment.LEFT}
+					intent={Intent.NONE}
+					fill={true}
+					large={true}
+					active={location.startsWith(url)}
+					icon={props.icon}
+				>
 					{props.name}
 				</AnchorButton>
 			</NavLink>
@@ -51,8 +58,11 @@ export const MenuTab: FunctionComponent<RouteProps & MenuTabProps> = (props) => 
 					<p style={{ color: 'black' }}>{props.onclickPopUp}</p>
 				</Alert>
 				<AnchorButton
+					alignText={Alignment.LEFT}
 					intent={Intent.NONE}
 					fill={true}
+					large={true}
+					icon={props.icon}
 					active={location.startsWith(url)}
 					onClick={() => {
 						setIsOpenError(true);
