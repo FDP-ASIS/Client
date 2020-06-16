@@ -5,7 +5,7 @@ import { MenuTab, MenuTabProps } from './MenuTab';
 import { RoutesPath } from '../../routers/routesPath';
 import Strings from '../../utils/strings';
 import { getMenu } from './menuRole';
-import { H3, H5 } from '@blueprintjs/core';
+import { H3, H5, IconName } from '@blueprintjs/core';
 
 const FillAllPage = styled.div`
 	position: relative;
@@ -51,7 +51,13 @@ export const Menu: FunctionComponent<MenuProps> = (props) => {
 				})}
 				<MenuTab name={Strings.PROFILE} link={RoutesPath.Profile} />
 				<MenuTab name={Strings.ABOUT_US} link={RoutesPath.AboutUs} />
-				<MenuTab name={Strings.LOGOUT} link={RoutesPath.Logout} noPrefix={true} />
+				<MenuTab
+					name={Strings.LOGOUT}
+					link={RoutesPath.Logout}
+					noPrefix={true}
+					onclickPopUp={Strings.LOGOUT_U_SURE}
+					icon={'log-out'}
+				/>
 			</FillAllPage>
 		</>
 	);

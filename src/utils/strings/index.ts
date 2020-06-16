@@ -7,6 +7,7 @@ export interface Strings {
 	ENTER_USERNAME: string;
 	ENTER_PASSWORD: string;
 	OK: string;
+	CANCEL: string;
 	HIDE: string;
 	SHOW: string;
 	USERNAME_OR_PASSWORD_NOT_ENTERED: string;
@@ -21,6 +22,7 @@ export interface Strings {
 	COURSES: string;
 	DEPARTMENTS: string;
 	ENROLL_TO_COURSE: string;
+	LOGOUT_U_SURE: string;
 }
 
 enum Languages {
