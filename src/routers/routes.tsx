@@ -6,6 +6,7 @@ import Login from '../pages/Login';
 import { RoutesPath } from './routesPath';
 import { PrivateRoute } from './private';
 import { Dashboard } from '../pages/Dashboard';
+import Logout from '../pages/Logout';
 
 export const Routes: React.SFC = () => {
 	return (
@@ -19,8 +20,7 @@ export const Routes: React.SFC = () => {
 				<PublicRoute path={RoutesPath.Splash} component={Splash} restricted />
 				<PublicRoute path={RoutesPath.Login} component={Login} restricted />
 				<PrivateRoute path={RoutesPath.Dashboard} component={Dashboard} />
-
-				{/*<PrivateRoute path="/logout" component={Logout} /> */}
+				<PrivateRoute path={RoutesPath.Logout} component={Logout} />
 				{/* <Route component={Error} /> */}
 			</Switch>
 		</Router>

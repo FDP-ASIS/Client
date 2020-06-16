@@ -9,6 +9,7 @@ interface UserWithToken {
 
 export class UserApi extends Api {
 	private readonly LOGIN = 'auth/login';
+	private readonly LOGOUT = 'auth/logout';
 	private readonly AUTH_WITH_TOKEN = 'auth';
 
 	public constructor(config?: AxiosRequestConfig) {
@@ -37,6 +38,10 @@ export class UserApi extends Api {
 
 	public loginWithToken<R = User>(token: string): Promise<R> {
 		return this.post<R, string>(this.AUTH_WITH_TOKEN, token);
+	}
+
+	public logout(): Promise<{}> {
+		return this.delete(this.LOGOUT);
 	}
 
 	// public userRegister(user: User): Promise<number> {

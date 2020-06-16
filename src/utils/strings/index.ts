@@ -15,6 +15,7 @@ export interface Strings {
 	PROFILE: string;
 	ABOUT_US: string;
 	LOGOUT: string;
+	LOGOUT_WAITING: string;
 	MY_COURSES: string;
 	USERS: string;
 	COURSES: string;

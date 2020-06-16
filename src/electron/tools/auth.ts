@@ -9,3 +9,8 @@ export const setAuthTokenStore = (token: string): boolean => {
 	sharedPreferences.set(AuthKeys.Token, token);
 	return true;
 };
+
+export const removeAuthTokenStore = (): boolean => {
+	sharedPreferences.delete(AuthKeys.Token);
+	return true;
+};

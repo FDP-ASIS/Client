@@ -12,6 +12,10 @@ export const logMeIn = async (credentials: Credentials): Promise<User> => {
 	});
 };
 
+export const logMeOut = async (): Promise<{}> => {
+	return userApi.logout().then(() => removeAuthToken());
+};
+
 export const getAuthToken = async (): Promise<string> => {
 	const { token } = await ipc.send<{ token: string }>(AuthChannels.GetAuthToken);
 	if (token) return Promise.resolve(token);
@@ -32,5 +36,13 @@ const setAuthToken = async (token: string): Promise<void> => {
 		}
 	);
 	if (succeed) return Promise.resolve();
+	return Promise.reject();
+};
+
+const removeAuthToken = async (): Promise<{}> => {
+	const { succeed } = await ipc.send<{ succeed: boolean }, { token: string }>(
+		AuthChannels.RemoveAuthToken
+	);
+	if (succeed) return Promise.resolve({});
 	return Promise.reject();
 };

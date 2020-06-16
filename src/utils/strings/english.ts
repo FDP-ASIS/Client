@@ -15,6 +15,7 @@ const english: Strings = {
 	PROFILE: 'Profile',
 	ABOUT_US: 'About Us',
 	LOGOUT: 'Logout',
+	LOGOUT_WAITING: 'Logout, please be patient',
 	MY_COURSES: 'My Courses',
 	USERS: 'Users',
 	COURSES: 'Courses',

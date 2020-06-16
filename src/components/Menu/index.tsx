@@ -37,7 +37,7 @@ export const Menu: FunctionComponent<MenuProps> = (props) => {
 				})}
 				<MenuTab name={Strings.PROFILE} link={RoutesPath.Profile} />
 				<MenuTab name={Strings.ABOUT_US} link={RoutesPath.AboutUs} />
-				<MenuTab name={Strings.LOGOUT} link={RoutesPath.Logout} />
+				<MenuTab name={Strings.LOGOUT} link={RoutesPath.Logout} noPrefix={true} />
 			</FillAllPage>
 		</>
 	);
