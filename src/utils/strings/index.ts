@@ -13,6 +13,13 @@ export interface Strings {
 	LOGIN_FAILED: string;
 	HELLO: string;
 	PROFILE: string;
+	ABOUT_US: string;
+	LOGOUT: string;
+	MY_COURSES: string;
+	USERS: string;
+	COURSES: string;
+	DEPARTMENTS: string;
+	ASSIGN_TO_COURSE: string;
 }
 
 enum Languages {

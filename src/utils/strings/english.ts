@@ -13,6 +13,13 @@ const english: Strings = {
 	LOGIN_FAILED: 'Username or password is invalid',
 	HELLO: 'Hello,',
 	PROFILE: 'Profile',
+	ABOUT_US: 'About Us',
+	LOGOUT: 'Logout',
+	MY_COURSES: 'My Courses',
+	USERS: 'Users',
+	COURSES: 'Courses',
+	DEPARTMENTS: 'Departments',
+	ASSIGN_TO_COURSE: 'Assign to course',
 };
 
 export default english;
