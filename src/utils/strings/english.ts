@@ -12,6 +12,7 @@ const english: Strings = {
 	USERNAME_OR_PASSWORD_NOT_ENTERED: 'Oops, you forget to enter your username/password',
 	LOGIN_FAILED: 'Username or password is invalid',
 	HELLO: 'Hello,',
+	PROFILE: 'Profile',
 };
 
 export default english;

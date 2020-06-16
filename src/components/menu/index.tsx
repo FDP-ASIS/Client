@@ -1,12 +1,10 @@
 import React, { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../../redux/reducers/user';
-import { Role } from '../../models/user';
+import { Role, Name, User } from '../../models/user';
 import styled from 'styled-components';
 import { MenuTab } from './MenuTab';
 import { RoutesPath } from '../../routers/routesPath';
 import { RouteProps } from 'react-router-dom';
-// import { String } from "../../utils/strings/english";
+import Strings from '../../utils/strings';
 
 const FillAllPage = styled.div`
 	position: relative;
@@ -14,10 +12,11 @@ const FillAllPage = styled.div`
 	width: 100%;
 `;
 
-export const Menu: FunctionComponent<RouteProps> = (props) => {
-	const user = useSelector(selectUser);
-
-	switch (user?.role) {
+interface MenuProps {
+	user: User;
+}
+export const Menu: FunctionComponent<RouteProps & MenuProps> = (props) => {
+	switch (props.user.role) {
 		case Role.STUDENT:
 			break;
 		case Role.LECTURER:
@@ -25,12 +24,17 @@ export const Menu: FunctionComponent<RouteProps> = (props) => {
 		case Role.ADMIN:
 			break;
 	}
+
+	const helloTo = (name: Name | undefined): string => {
+		if (name) return name.first + `${name.middle ? ' ' + name.middle : ''} ` + name.last;
+		return '';
+	};
 	// HELLO
 	return (
 		<>
-			Hello,
 			<FillAllPage>
-				<MenuTab name="Profile" link={RoutesPath.Profile} />
+				{Strings.HELLO} {helloTo(props.user.name)}
+				<MenuTab name={Strings.PROFILE} link={RoutesPath.Profile} />
 			</FillAllPage>
 		</>
 	);

@@ -79,6 +79,7 @@ export class User {
 	constructor(id: String, name: Name, username: String, email: String, role: Role) {
 		this.id = id;
 		this.name = name;
+		this.username = username;
 		this.email = email;
 		this.role = role;
 	}

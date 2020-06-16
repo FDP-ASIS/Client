@@ -12,6 +12,7 @@ export interface Strings {
 	USERNAME_OR_PASSWORD_NOT_ENTERED: string;
 	LOGIN_FAILED: string;
 	HELLO: string;
+	PROFILE: string;
 }
 
 enum Languages {
