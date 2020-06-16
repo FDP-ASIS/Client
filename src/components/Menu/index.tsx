@@ -5,25 +5,36 @@ import { MenuTab, MenuTabProps } from './MenuTab';
 import { RoutesPath } from '../../routers/routesPath';
 import Strings from '../../utils/strings';
 import { getMenu } from './menuRole';
+import { H3, H5 } from '@blueprintjs/core';
 
 const FillAllPage = styled.div`
 	position: relative;
 	height: 100%;
 	width: 100%;
+	box-shadow: 10px 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 `;
 
 interface MenuProps {
 	user: User;
 }
 
+const Hello = styled('div')`
+	padding: 10px;
+	margin-bottom: 5%;
+	text-align: center;
+`;
+
+const H3Color = styled(H3)`
+	color: white;
+	margin-bottom: 5%;
+`;
+
+const H5Color = styled(H5)`
+	color: white;
+`;
+
 export const Menu: FunctionComponent<MenuProps> = (props) => {
 	let menu: MenuTabProps[] = getMenu(props.user.role);
-	// let { path } = useRouteMatch();
-	// const moveTo = (route: RoutesPath): string => {
-	// return RoutesPath.Dashboard + '/' + route;
-	// };
-	// if (path.match(RoutesPath.Dashboard)) moveTo(RoutesPath.MyCourses);
-
 	const helloTo = (name: Name | undefined): string => {
 		if (name) return name.first + `${name.middle ? ' ' + name.middle : ''} ` + name.last;
 		return '';
@@ -31,7 +42,10 @@ export const Menu: FunctionComponent<MenuProps> = (props) => {
 	return (
 		<>
 			<FillAllPage>
-				{Strings.HELLO} {helloTo(props.user.name)}
+				<Hello>
+					<H3Color>{Strings.HELLO}</H3Color>
+					<H5Color>{helloTo(props.user.name)}</H5Color>
+				</Hello>
 				{menu.map((menuTabProps) => {
 					return <MenuTab name={menuTabProps.name} link={menuTabProps.link} />;
 				})}

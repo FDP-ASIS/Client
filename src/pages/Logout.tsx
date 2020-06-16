@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { AppDispatch } from '../redux/store';
 import { removeUser } from '../redux/reducers/user';
 import Strings from '../utils/strings';
-import { H2, Colors } from '@blueprintjs/core';
+import { H2 } from '@blueprintjs/core';
 
 const Center = styled.div`
 	position: absolute;
@@ -48,7 +48,7 @@ export const Logout: React.FunctionComponent<LoginComponentProps> = (props) => {
 
 	return (
 		<Center>
-			<H2Color color={Colors.WHITE}>{Strings.LOGOUT_WAITING}</H2Color>
+			<H2Color>{Strings.LOGOUT_WAITING}</H2Color>
 			<Article>
 				<ReactLoading
 					type={'spinningBubbles'}

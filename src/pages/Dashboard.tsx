@@ -12,16 +12,27 @@ const FillAllPage = styled.div`
 	width: 100%;
 `;
 
+const CurrentPageStyle = styled.div`
+	background-color: #e1e8ed;
+	position: relative;
+	height: 100%;
+	width: 100%;
+	color: #000;
+	padding: 2%;
+`;
+
 export const Dashboard: FunctionComponent<{}> = () => {
 	const user = useSelector(selectUser);
 	return (
 		<FillAllPage>
-			<Row gutter={[0, 20]} style={{ margin: 0, height: '100%' }}>
+			<Row gutter={[6, 0]} style={{ margin: 0, height: '100%' }}>
 				<Col span={6}>
 					<Menu user={user!} />
 				</Col>
 				<Col span={18}>
-					<CurrentPage />
+					<CurrentPageStyle>
+						<CurrentPage />
+					</CurrentPageStyle>
 				</Col>
 			</Row>
 		</FillAllPage>
