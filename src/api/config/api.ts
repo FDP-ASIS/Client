@@ -21,8 +21,7 @@ import { apiConfig } from './config';
  * }
  */
 export class Api {
-	protected api: AxiosInstance;
-
+	protected readonly api: AxiosInstance;
 	/**
 	 * Creates an instance of Api.
 	 *
@@ -36,6 +35,7 @@ export class Api {
 			...apiConfig,
 			...param,
 		}));
+		this.api.interceptors.response.use(this.success, this.error);
 
 		this.getUri = this.getUri.bind(this);
 		this.request = this.request.bind(this);
@@ -63,7 +63,6 @@ export class Api {
 	 *
 	 * @access public
 	 * @template T - `TYPE`: expected object.
-	 * @template R - `RESPONSE`: expected object inside a axios response format.
 	 * @param {import("axios").AxiosRequestConfig} [config] - axios request configuration.
 	 * @returns {Promise<R>} - HTTP axios response payload.
 	 * @memberof Api
@@ -79,7 +78,7 @@ export class Api {
 	 * }).then((response: AxiosResponse<User>) => response.data)
 	 *
 	 */
-	protected request<T, R = AxiosResponse<T>>(config: AxiosRequestConfig): Promise<R> {
+	protected request<T>(config: AxiosRequestConfig): Promise<T> {
 		return this.api.request(config);
 	}
 
@@ -88,13 +87,12 @@ export class Api {
 	 *
 	 * @access public
 	 * @template T - `TYPE`: expected object.
-	 * @template R - `RESPONSE`: expected object inside a axios response format.
 	 * @param {string} url - endpoint you want to reach.
 	 * @param {import("axios").AxiosRequestConfig} [config] - axios request configuration.
 	 * @returns {Promise<R>} HTTP `axios` response payload.
 	 * @memberof Api
 	 */
-	protected get<T, R = AxiosResponse<T>>(url: string, config?: AxiosRequestConfig): Promise<R> {
+	protected get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
 		return this.api.get(url, config);
 	}
 
@@ -103,16 +101,12 @@ export class Api {
 	 *
 	 * @access public
 	 * @template T - `TYPE`: expected object.
-	 * @template R - `RESPONSE`: expected object inside a axios response format.
 	 * @param {string} url - endpoint you want to reach.
 	 * @param {import("axios").AxiosRequestConfig} [config] - axios request configuration.
 	 * @returns {Promise<R>} - HTTP [axios] response payload.
 	 * @memberof Api
 	 */
-	protected delete<T, R = AxiosResponse<T>>(
-		url: string,
-		config?: AxiosRequestConfig
-	): Promise<R> {
+	protected delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
 		return this.api.delete(url, config);
 	}
 
@@ -121,13 +115,12 @@ export class Api {
 	 *
 	 * @access public
 	 * @template T - `TYPE`: expected object.
-	 * @template R - `RESPONSE`: expected object inside a axios response format.
 	 * @param {string} url - endpoint you want to reach.
 	 * @param {import("axios").AxiosRequestConfig} [config] - axios request configuration.
 	 * @returns {Promise<R>} - HTTP [axios] response payload.
 	 * @memberof Api
 	 */
-	protected head<T, R = AxiosResponse<T>>(url: string, config?: AxiosRequestConfig): Promise<R> {
+	protected head<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
 		return this.api.head(url, config);
 	}
 
@@ -137,18 +130,13 @@ export class Api {
 	 * @access public
 	 * @template T - `TYPE`: expected object.
 	 * @template B - `BODY`: body request object.
-	 * @template R - `RESPONSE`: expected object inside a axios response format.
 	 * @param {string} url - endpoint you want to reach.
 	 * @param {B} data - payload to be send as the `request body`,
 	 * @param {import("axios").AxiosRequestConfig} [config] - axios request configuration.
 	 * @returns {Promise<R>} - HTTP [axios] response payload.
 	 * @memberof Api
 	 */
-	protected post<T, B, R = AxiosResponse<T>>(
-		url: string,
-		data?: B,
-		config?: AxiosRequestConfig
-	): Promise<R> {
+	protected post<T, B>(url: string, data?: B, config?: AxiosRequestConfig): Promise<T> {
 		return this.api.post(url, data, config);
 	}
 
@@ -158,18 +146,13 @@ export class Api {
 	 * @access public
 	 * @template T - `TYPE`: expected object.
 	 * @template B - `BODY`: body request object.
-	 * @template R - `RESPONSE`: expected object inside a axios response format.
 	 * @param {string} url - endpoint you want to reach.
 	 * @param {B} data - payload to be send as the `request body`,
 	 * @param {import("axios").AxiosRequestConfig} [config] - axios request configuration.
 	 * @returns {Promise<R>} - HTTP [axios] response payload.
 	 * @memberof Api
 	 */
-	protected put<T, B, R = AxiosResponse<T>>(
-		url: string,
-		data?: B,
-		config?: AxiosRequestConfig
-	): Promise<R> {
+	protected put<T, B>(url: string, data?: B, config?: AxiosRequestConfig): Promise<T> {
 		return this.api.put(url, data, config);
 	}
 
@@ -179,18 +162,13 @@ export class Api {
 	 * @access public
 	 * @template T - `TYPE`: expected object.
 	 * @template B - `BODY`: body request object.
-	 * @template R - `RESPONSE`: expected object inside a axios response format.
 	 * @param {string} url - endpoint you want to reach.
 	 * @param {B} data - payload to be send as the `request body`,
 	 * @param {import("axios").AxiosRequestConfig} [config] - axios request configuration.
 	 * @returns {Promise<R>} - HTTP [axios] response payload.
 	 * @memberof Api
 	 */
-	protected patch<T, B, R = AxiosResponse<T>>(
-		url: string,
-		data?: B,
-		config?: AxiosRequestConfig
-	): Promise<R> {
+	protected patch<T, B>(url: string, data?: B, config?: AxiosRequestConfig): Promise<T> {
 		return this.api.patch(url, data, config);
 	}
 
@@ -205,7 +183,12 @@ export class Api {
 		return response.data;
 	}
 
-	protected error(error: AxiosError<Error>) {
-		throw error;
+	protected error<T = Error>(error: AxiosError<T>): Promise<T> {
+		return Promise.reject(error);
+		// throw error;
 	}
 }
+
+// interface ClassType<T> {
+// 	new (...args: any[]): T;
+// }

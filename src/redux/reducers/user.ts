@@ -1,6 +1,7 @@
+import { Role } from './../../models/user';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../../redux/store';
-import { User } from '../../models/user';
+import { User, Name } from '../../models/user';
 
 interface UserState {
 	user: User | null;
@@ -9,6 +10,19 @@ interface UserState {
 const initialState: UserState = {
 	user: null,
 };
+
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+	initialState.user = new User(
+		'012345678',
+		new Name('first', 'middle', 'last'),
+		'username',
+		'mail@mail.com',
+		Role.ADMIN
+	);
+}
+// else {
+// 	// production code
+// }
 
 export const userSlice = createSlice({
 	name: 'user',
