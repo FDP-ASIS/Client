@@ -9,9 +9,10 @@ export const CurrentPage: FunctionComponent<{}> = () => {
 
 	return (
 		<Switch>
-			{dashRoutes.map((route) => {
+			{dashRoutes.map((route, key) => {
 				return (
 					<PrivateRoute
+						key={key}
 						path={addToCurrent(route.path)}
 						component={route.component}
 						onlyRole={route.onlyRole}

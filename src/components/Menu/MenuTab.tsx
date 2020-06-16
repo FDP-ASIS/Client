@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { RoutesPath } from '../../routers/routesPath';
-import { NavLink, RouteProps, useLocation, useHistory } from 'react-router-dom';
+import { RouteProps, useLocation, useHistory } from 'react-router-dom';
 import { AnchorButton, Intent, Alert, IconName, Alignment } from '@blueprintjs/core';
 import Strings from '../../utils/strings/index';
 
@@ -23,18 +23,19 @@ export const MenuTab: FunctionComponent<RouteProps & MenuTabProps> = (props) => 
 			: RoutesPath.Dashboard + '/' + props.link.toString();
 	if (props.onclickPopUp === undefined)
 		return (
-			<NavLink to={url} activeClassName="active">
-				<AnchorButton
-					alignText={Alignment.LEFT}
-					intent={Intent.NONE}
-					fill={true}
-					large={true}
-					active={location.startsWith(url)}
-					icon={props.icon}
-				>
-					{props.name}
-				</AnchorButton>
-			</NavLink>
+			// <NavLink to={url} activeClassName="active">
+			<AnchorButton
+				alignText={Alignment.LEFT}
+				intent={Intent.NONE}
+				fill={true}
+				large={true}
+				active={location.startsWith(url)}
+				icon={props.icon}
+				onClick={() => history.push(url)}
+			>
+				{props.name}
+			</AnchorButton>
+			// </NavLink>
 		);
 	else {
 		return (
