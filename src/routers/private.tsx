@@ -5,12 +5,12 @@ import { useSelector } from 'react-redux';
 import { selectUser } from '../redux/reducers/user';
 import { Role } from '../models/user';
 
-type PrivateRouteProps = {
+export type PrivateRouteProps = {
 	component: React.ComponentType;
 	onlyRole?: Role[];
-} & RouteProps;
+};
 
-export const PrivateRoute: React.SFC<PrivateRouteProps> = ({
+export const PrivateRoute: React.SFC<PrivateRouteProps & RouteProps> = ({
 	component: Component,
 	onlyRole,
 	...rest

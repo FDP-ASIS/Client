@@ -1,10 +1,21 @@
 import { IpcChannelInterface } from './main/IpcChannelInterface';
 
-import { GetAuthTokenChannel, SetAuthTokenChannel } from './main/authChannel';
+import {
+	GetAuthTokenChannel,
+	SetAuthTokenChannel,
+	RemoveAuthTokenChannel,
+} from './main/authChannel';
 
-const ipcs: IpcChannelInterface<any>[] = [];
+interface ClassType<T> {
+	new (...args: any[]): T;
+}
 
-ipcs.push(new GetAuthTokenChannel());
-ipcs.push(new SetAuthTokenChannel());
+const ipcsClasses: ClassType<any>[] = [
+	GetAuthTokenChannel,
+	SetAuthTokenChannel,
+	RemoveAuthTokenChannel,
+];
+
+const ipcs: IpcChannelInterface<any>[] = ipcsClasses.map((clazz) => new clazz());
 
 export default ipcs;
