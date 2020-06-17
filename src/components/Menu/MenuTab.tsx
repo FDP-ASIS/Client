@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react';
 import { RoutesPath } from '../../routers/routesPath';
-import { RouteProps, useLocation, useHistory } from 'react-router-dom';
+import { RouteProps, useLocation, useHistory, useRouteMatch } from 'react-router-dom';
 import { AnchorButton, Intent, Alert, IconName, Alignment } from '@blueprintjs/core';
 import Strings from '../../utils/strings/index';
 
@@ -15,12 +15,13 @@ export interface MenuTabProps {
 
 export const MenuTab: FunctionComponent<RouteProps & MenuTabProps> = (props) => {
 	const [isOpenError, setIsOpenError] = useState(false);
+	let { path } = useRouteMatch();
 	let location = useLocation().pathname;
 	let history = useHistory();
 	let url =
 		props.noPrefix !== undefined && props.noPrefix === true
 			? props.link.toString()
-			: RoutesPath.Dashboard + '/' + props.link.toString();
+			: `${path}/${props.link.toString()}`;
 	if (props.onclickPopUp === undefined)
 		return (
 			// <NavLink to={url} activeClassName="active">
