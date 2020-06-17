@@ -11,4 +11,7 @@ export enum RoutesPath {
 	Courses = 'courses',
 	Departments = 'departments',
 	EnrollToCourse = 'enroll',
+	AddDepartments = 'addDepartments',
+	DetailsDepartment = 'detailsDepartment',
+	Settings = 'settings',
 }

@@ -9,6 +9,7 @@ import Courses from '../Courses';
 import Departments from '../Departments';
 import Profile from '../Profile';
 import AboutUs from '../AboutUs';
+import Settings from '../Settings';
 
 export interface pages extends PrivateRouteProps {
 	path: RoutesPath;
@@ -52,5 +53,9 @@ export const dashRoutes: pages[] = [
 	{
 		path: RoutesPath.AboutUs,
 		component: AboutUs,
+	},
+	{
+		path: RoutesPath.Settings,
+		component: Settings,
 	},
 ];

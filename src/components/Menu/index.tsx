@@ -75,6 +75,7 @@ export const Menu: FunctionComponent<MenuProps> = (props) => {
 				})}
 				<MenuTab name={Strings.PROFILE} link={RoutesPath.Profile} icon="user" />
 				<MenuTab name={Strings.ABOUT_US} link={RoutesPath.AboutUs} icon={'code'} />
+				<MenuTab name={Strings.SETTINGS} link={RoutesPath.Settings} icon={'cog'} />
 				<MenuTab
 					name={Strings.LOGOUT}
 					link={RoutesPath.Logout}

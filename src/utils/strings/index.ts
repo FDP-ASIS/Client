@@ -23,6 +23,10 @@ export interface Strings {
 	DEPARTMENTS: string;
 	ENROLL_TO_COURSE: string;
 	LOGOUT_U_SURE: string;
+	SEARCH_DEPARTMENT: string;
+	CODE: string;
+	NAME: string;
+	SETTINGS: string;
 }
 
 enum Languages {

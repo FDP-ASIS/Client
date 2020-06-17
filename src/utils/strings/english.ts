@@ -23,6 +23,10 @@ const english: Strings = {
 	DEPARTMENTS: 'Departments',
 	ENROLL_TO_COURSE: 'Assign to course',
 	LOGOUT_U_SURE: 'Are you sure that you want to logout?',
+	SEARCH_DEPARTMENT: 'Search department by',
+	CODE: 'code',
+	NAME: 'name',
+	SETTINGS: 'Settings',
 };
 
 export default english;
