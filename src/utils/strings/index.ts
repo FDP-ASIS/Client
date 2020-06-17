@@ -33,6 +33,7 @@ export interface Strings {
 	DELETE_ALL_DEPARTMENT: string;
 	SEARCH: string;
 	CLEAR: string;
+	NO_RESULT_FOUND: string;
 }
 
 enum Languages {
