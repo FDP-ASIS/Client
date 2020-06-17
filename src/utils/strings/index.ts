@@ -25,8 +25,14 @@ export interface Strings {
 	LOGOUT_U_SURE: string;
 	SEARCH_DEPARTMENT: string;
 	CODE: string;
+	ENTER_CODE_TO_SEARCH: string;
 	NAME: string;
+	ENTER_NAME_TO_SEARCH: string;
 	SETTINGS: string;
+	ADD_NEW_DEPARTMENT: string;
+	DELETE_ALL_DEPARTMENT: string;
+	SEARCH: string;
+	CLEAR: string;
 }
 
 enum Languages {

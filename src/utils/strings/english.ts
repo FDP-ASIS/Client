@@ -24,9 +24,15 @@ const english: Strings = {
 	ENROLL_TO_COURSE: 'Assign to course',
 	LOGOUT_U_SURE: 'Are you sure that you want to logout?',
 	SEARCH_DEPARTMENT: 'Search department by',
-	CODE: 'code',
-	NAME: 'name',
+	CODE: 'Code:',
+	ENTER_CODE_TO_SEARCH: 'Enter name here',
+	NAME: 'Name:',
+	ENTER_NAME_TO_SEARCH: 'Enter name code',
 	SETTINGS: 'Settings',
+	ADD_NEW_DEPARTMENT: 'Add new department',
+	DELETE_ALL_DEPARTMENT: 'Delete all departments',
+	SEARCH: 'Search',
+	CLEAR: 'Clear',
 };
 
 export default english;
