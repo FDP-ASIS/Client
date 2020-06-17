@@ -3,21 +3,23 @@ import Strings from '../../../utils/strings';
 import { H3, Button, Alignment, Intent, InputGroup } from '@blueprintjs/core';
 import styled from 'styled-components';
 import { Row, Col } from 'antd';
+import { Element } from 'react-scroll';
 
 export interface Props {}
 
-export interface State {}
+export interface State {
+	disabled: boolean;
+}
 
 const FillAllPage = styled.div`
 	position: relative;
 	height: 100%;
 	width: 100%;
+	display: flex;
+	flex-direction: column;
 `;
 
-export interface SearchDepartmentState {
-	disabled: boolean;
-}
-export default class SearchDepartment extends React.Component<Props, SearchDepartmentState> {
+export default class SearchDepartment extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 
@@ -55,7 +57,7 @@ export default class SearchDepartment extends React.Component<Props, SearchDepar
 									/>
 								</Col>
 							</Row>
-							<Row gutter={[6, 6]}>
+							<Row gutter={[6, 20]}>
 								<Col span={2} offset={6}>
 									<Button
 										text={Strings.SEARCH}
@@ -92,6 +94,17 @@ export default class SearchDepartment extends React.Component<Props, SearchDepar
 						/>
 					</Col>
 				</Row>
+
+				<Element
+					name="test7"
+					style={{
+						flexGrow: 1,
+						height: '1px',
+						overflow: 'scroll',
+					}}
+				>
+					result
+				</Element>
 			</FillAllPage>
 		);
 	}
