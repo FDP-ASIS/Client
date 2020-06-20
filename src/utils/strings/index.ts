@@ -7,6 +7,7 @@ export interface Strings {
 	ENTER_USERNAME: string;
 	ENTER_PASSWORD: string;
 	OK: string;
+	YES: string;
 	CANCEL: string;
 	HIDE: string;
 	SHOW: string;
@@ -27,13 +28,21 @@ export interface Strings {
 	CODE: string;
 	ENTER_CODE_TO_SEARCH: string;
 	NAME: string;
+	FULL_NAME: string;
 	ENTER_NAME_TO_SEARCH: string;
 	SETTINGS: string;
 	ADD_NEW_DEPARTMENT: string;
 	DELETE_ALL_DEPARTMENT: string;
+	ARE_YOU_SURE: string;
 	SEARCH: string;
 	CLEAR: string;
 	NO_RESULT_FOUND: string;
+	RESULT: string;
+	OPTIONS: string;
+	NEXT: string;
+	PREV: string;
+	DELETE: string;
+	EDIT: string;
 }
 
 enum Languages {

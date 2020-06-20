@@ -1,16 +1,32 @@
 import * as React from 'react';
 import Strings from '../../../utils/strings';
-import { H3, H2, Button, Alignment, Intent, InputGroup } from '@blueprintjs/core';
+import {
+	H3,
+	H2,
+	Button,
+	Alignment,
+	Intent,
+	InputGroup,
+	NumericInput,
+	Spinner,
+	Alert,
+} from '@blueprintjs/core';
 import styled from 'styled-components';
-import { Row, Col } from 'antd';
-import { Element } from 'react-scroll';
+import { Table, Empty, Row, Col, Space } from 'antd';
+// import { Element } from 'react-scroll';
 import { Department } from '../../../models/department';
+
+const { Column } = Table;
 
 export interface Props {}
 
 export interface State {
-	disabled: boolean;
-	departments: Department[];
+	loading: boolean;
+	data: Department[];
+	clicked: boolean;
+	currentPage: number;
+	hasNextPage: boolean;
+	isOpenAlert: boolean;
 }
 
 const FillAllPage = styled.div`
@@ -35,16 +51,89 @@ export default class SearchDepartment extends React.Component<Props, State> {
 		super(props);
 
 		this.state = {
-			disabled: false,
-			departments: [],
+			loading: false,
+			clicked: false,
+			currentPage: 0,
+			hasNextPage: false,
+			isOpenAlert: false,
+			data: [
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+				new Department('software', 10),
+				new Department('test', 20),
+			],
 		};
 	}
 
+	search = () => {
+		this.setState({ clicked: true });
+	};
+
+	clear = () => {
+		this.setState({ clicked: false });
+	};
+
 	render() {
-		const { disabled, departments } = this.state;
+		const { loading, data, clicked, currentPage, hasNextPage, isOpenAlert } = this.state;
 
 		return (
 			<FillAllPage>
+				<Alert
+					confirmButtonText={Strings.YES}
+					cancelButtonText={Strings.CANCEL}
+					intent={Intent.DANGER}
+					canEscapeKeyCancel
+					canOutsideClickCancel
+					icon="trash"
+					isOpen={isOpenAlert}
+					onConfirm={() => {
+						this.setState({
+							isOpenAlert: false,
+						});
+						// TODO send request to delete
+					}}
+					onCancel={() => {
+						this.setState({
+							isOpenAlert: false,
+						});
+					}}
+				>
+					<p style={{ color: 'black' }}>{Strings.ARE_YOU_SURE}</p>
+				</Alert>
 				<Row gutter={[6, 6]}>
 					<Col span={16}>
 						<H3>{Strings.SEARCH_DEPARTMENT}</H3>
@@ -53,19 +142,20 @@ export default class SearchDepartment extends React.Component<Props, State> {
 								<Col span={3}>{Strings.NAME}:</Col>
 								<Col span={16}>
 									<InputGroup
-										id="text-input"
 										placeholder={Strings.ENTER_NAME_TO_SEARCH}
-										disabled={disabled}
+										disabled={loading}
 									/>
 								</Col>
 							</Row>
 							<Row gutter={[6, 24]}>
 								<Col span={3}>{Strings.CODE}:</Col>
 								<Col span={16}>
-									<InputGroup
-										id="text-input"
+									<NumericInput
+										allowNumericCharactersOnly={true}
+										fill={true}
 										placeholder={Strings.ENTER_CODE_TO_SEARCH}
-										disabled={disabled}
+										disabled={loading}
+										min={0}
 									/>
 								</Col>
 							</Row>
@@ -73,15 +163,17 @@ export default class SearchDepartment extends React.Component<Props, State> {
 								<Col span={2} offset={6}>
 									<Button
 										text={Strings.SEARCH}
-										disabled={disabled}
+										disabled={loading}
 										intent={Intent.PRIMARY}
+										onClick={this.search}
 									/>
 								</Col>
 								<Col span={2} offset={3}>
 									<Button
 										text={Strings.CLEAR}
-										disabled={disabled}
+										disabled={loading}
 										intent={Intent.WARNING}
+										onClick={this.clear}
 									/>
 								</Col>
 							</Row>
@@ -94,6 +186,7 @@ export default class SearchDepartment extends React.Component<Props, State> {
 								alignText={Alignment.LEFT}
 								rightIcon={'add'}
 								fill={true}
+								disabled={loading}
 								text={Strings.ADD_NEW_DEPARTMENT}
 							/>
 						</div>
@@ -102,26 +195,86 @@ export default class SearchDepartment extends React.Component<Props, State> {
 							rightIcon={'delete'}
 							alignText={Alignment.LEFT}
 							fill={true}
+							disabled={loading}
 							text={Strings.DELETE_ALL_DEPARTMENT}
+							onClick={() =>
+								this.setState({
+									isOpenAlert: true,
+								})
+							}
 						/>
 					</Col>
 				</Row>
 
-				{departments.length === 0 ? (
-					<Center>{Strings.NO_RESULT_FOUND}</Center>
+				{loading ? (
+					<Center>
+						<Spinner />
+					</Center>
+				) : data.length === 0 ? (
+					clicked ? (
+						<Center>
+							<Empty description={Strings.NO_RESULT_FOUND} />
+						</Center>
+					) : null
 				) : (
-					<Element
-						name="test7"
-						style={{
-							flexGrow: 1,
-							height: '1px',
-							overflow: 'scroll',
-						}}
-					>
-						<Center>result</Center>
-					</Element>
+					// <Element
+					// 	name="search"
+					// 	style={{
+					// 		flexGrow: 1,
+					// 		height: '1px',
+					// 		// overflow: 'scroll',
+					// 	}}
+					// >
+					<>
+						<Table
+							dataSource={data}
+							scroll={{ x: true, y: 320 }}
+							pagination={false}
+							style={{ marginBottom: 20 }}
+						>
+							<Column title={Strings.NAME} dataIndex="name" key="name" />
+							<Column title={Strings.CODE} dataIndex="code" key="code" />
+							<Column
+								title="Action"
+								key="action"
+								render={(text, record: Department) => (
+									<Space size="middle">
+										<Button
+											text={Strings.EDIT}
+											intent={Intent.WARNING}
+											onClick={() => console.log(record.code)}
+										/>
+										<Button text={Strings.DELETE} intent={Intent.DANGER} />
+									</Space>
+								)}
+							/>
+						</Table>
+						<Row gutter={[6, 6]} justify="end">
+							<Col>
+								<Button text={`< ${Strings.PREV}`} disabled={currentPage === 0} />
+							</Col>
+							<Col>
+								<Button text={`${Strings.NEXT} >`} disabled={hasNextPage} />
+							</Col>
+						</Row>
+					</>
+					// </Element>
 				)}
 			</FillAllPage>
 		);
 	}
 }
+// <Table
+// 	style={{
+// 		marginBottom: '20px',
+// 	}}
+// 	bordered
+// 	size="small"
+// 	pagination={false}
+// 	scroll={{
+// 		y: 320,
+// 		x: true,
+// 	}}
+// 	columns={columns}
+// 	dataSource={data}
+// >
