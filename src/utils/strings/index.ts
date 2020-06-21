@@ -32,6 +32,7 @@ export interface Strings {
 	ENTER_NAME_TO_SEARCH: string;
 	SETTINGS: string;
 	ADD_NEW_DEPARTMENT: string;
+	ADD_NEW_ROW: string;
 	DELETE_ALL_DEPARTMENT: string;
 	ARE_YOU_SURE: string;
 	SEARCH: string;
@@ -43,6 +44,14 @@ export interface Strings {
 	PREV: string;
 	DELETE: string;
 	EDIT: string;
+	ACTIONS: string;
+	EDIT_DEPARTMENT: string;
+	CLOSE: string;
+	SAVE: string;
+	ADD_DEPARTMENT: string;
+	SORT_ASC: string;
+	SORT_DESC: string;
+	IMPORT_FILE: string;
 }
 
 enum Languages {

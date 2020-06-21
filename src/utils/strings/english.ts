@@ -32,6 +32,7 @@ const english: Strings = {
 	ENTER_NAME_TO_SEARCH: 'Enter name here',
 	SETTINGS: 'Settings',
 	ADD_NEW_DEPARTMENT: 'Add new department',
+	ADD_NEW_ROW: 'Add new row',
 	DELETE_ALL_DEPARTMENT: 'Delete all departments',
 	ARE_YOU_SURE: 'Do you sure?',
 	SEARCH: 'Search',
@@ -43,6 +44,14 @@ const english: Strings = {
 	PREV: 'Prev',
 	DELETE: 'DELETE',
 	EDIT: 'Edit',
+	ACTIONS: 'Actions',
+	EDIT_DEPARTMENT: 'Edit Department',
+	CLOSE: 'Close',
+	SAVE: 'Save',
+	ADD_DEPARTMENT: 'Add new departments',
+	SORT_ASC: 'Sort Asc',
+	SORT_DESC: 'Sort Desc',
+	IMPORT_FILE: 'Import by file',
 };
 
 export default english;
