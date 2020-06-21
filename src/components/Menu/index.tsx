@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useEffect } from 'react';
 import { Name, User, Role } from '../../models/user';
 import styled from 'styled-components';
 import { MenuTab, MenuTabProps } from './MenuTab';
@@ -42,20 +42,24 @@ export const Menu: FunctionComponent<MenuProps> = (props) => {
 		if (name) return name.first + `${name.middle ? ' ' + name.middle : ''} ` + name.last;
 		return '';
 	};
-	switch (props.user.role) {
-		case Role.STUDENT:
-			if (location.endsWith(RoutesPath.Dashboard.toString()))
-				history.replace(RoutesPath.Dashboard + '/' + RoutesPath.MyCourses);
-			break;
-		case Role.LECTURER:
-			if (location.endsWith(RoutesPath.Dashboard.toString()))
-				history.replace(RoutesPath.Dashboard + '/' + RoutesPath.MyCourses);
-			break;
-		case Role.ADMIN:
-			if (location.endsWith(RoutesPath.Dashboard.toString()))
-				history.replace(RoutesPath.Dashboard + '/' + RoutesPath.Users);
-			break;
-	}
+	useEffect(() => {
+		switch (props.user.role) {
+			case Role.STUDENT:
+				if (location.endsWith(RoutesPath.Dashboard.toString()))
+					history.replace(RoutesPath.Dashboard + '/' + RoutesPath.MyCourses);
+				break;
+			case Role.LECTURER:
+				if (location.endsWith(RoutesPath.Dashboard.toString()))
+					history.replace(RoutesPath.Dashboard + '/' + RoutesPath.MyCourses);
+				break;
+			case Role.ADMIN:
+				if (location.endsWith(RoutesPath.Dashboard.toString()))
+					history.replace(RoutesPath.Dashboard + '/' + RoutesPath.Users);
+				break;
+		}
+		return () => {};
+	});
+
 	return (
 		<>
 			<FillAllPage>

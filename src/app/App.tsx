@@ -3,7 +3,7 @@ import { store } from '../redux/store';
 import { Provider } from 'react-redux';
 import { Routes } from '../routers/routes';
 
-import './App.css';
+import './App.scss';
 
 const App: React.SFC = () => {
 	return (
