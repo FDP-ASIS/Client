@@ -18,6 +18,7 @@
 		"electron-build:prod": "tsc -p ./config/electron/tsconfig.production.json",
 		"electron-start:dev": "concurrently -c \"yellow.bold,cyan.bold\" -n \"WATCH,DEV\" \"yarn run electron-build:dev\" \"wait-on http://localhost:3000 && electron .\"",
 		"dev": "concurrently -c \"blue.bold,magenta.bold\" -n \"REACT,ELECTRON\" \"cross-env BROWSER=none yarn start\" \"yarn run electron-start:dev\"",
+		"dev:light": "concurrently -c \"blue.bold,magenta.bold\" -n \"REACT,ELECTRON\" \"cross-env BROWSER=none yarn start\" \"yarn run electron-build:prod && wait-on http://localhost:3000 && electron .\"",
 		"preelectron-dist": "yarn run project-build",
 		"electron-dist": "electron-builder -c.extraMetadata.main=build/electron/electron/main.js -w",
 		"preelectron-pack": "yarn run project-build",

@@ -12,6 +12,7 @@ import {
 	Alert,
 	Overlay,
 	Classes,
+	Toaster,
 } from '@blueprintjs/core';
 import styled from 'styled-components';
 import { Table, Empty, Row, Col, Space } from 'antd';
@@ -26,6 +27,8 @@ import {
 // import { Element } from 'react-scroll';
 import { Department } from '../../models/department';
 import { readDepartmentCSV } from '../../utils/readCSV';
+import { DepartmentApi } from '../../api/department';
+import { IconName } from '@blueprintjs/core';
 
 const { Column } = Table;
 
@@ -46,6 +49,8 @@ export interface State {
 	OverlayIsOpen: boolean;
 	currentDepartmentCode?: number;
 	currentDepartment: null | Department;
+	searchName?: string | undefined;
+	searchCode?: number | undefined;
 }
 
 const OVERLAY_CLASS = 'overlay-transition';
@@ -56,6 +61,13 @@ const FillAllPage = styled.div`
 	width: 100%;
 	display: flex;
 	flex-direction: column;
+`;
+
+const CenterPage = styled.div`
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 `;
 
 const Center = styled(H2)`
@@ -70,10 +82,11 @@ const Center = styled(H2)`
 
 export default class DepartmentUI extends React.Component<Props, State> {
 	inputReference: React.RefObject<HTMLInputElement> = React.createRef();
+	departmentApi: DepartmentApi;
 
 	constructor(props: Props) {
 		super(props);
-
+		this.departmentApi = new DepartmentApi();
 		this.state = {
 			loading: false,
 			clicked: false,
@@ -84,7 +97,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 			OverlayIsOpen: false,
 			currentDepartment: null,
 			addData: [],
-			data: [new Department('software1', 110)],
+			data: [],
 		};
 	}
 	fileUploadAction = () => this.inputReference!.current!.click();
@@ -106,13 +119,56 @@ export default class DepartmentUI extends React.Component<Props, State> {
 				});
 		}
 	};
+	private toaster: Toaster | undefined;
 
-	search = () => {
-		this.setState({ clicked: true });
+	private addToast = (reason: string, color: Intent, icon: IconName) => {
+		if (this.toaster) this.toaster.show({ message: reason, intent: color, icon: icon });
+	};
+
+	createAllDepartments = () => {
+		if (this.state.addData.length) {
+			this.setState({
+				loading: true,
+			});
+			this.departmentApi
+				.create(this.state.addData)
+				.then(() => {
+					this.closeOverlay();
+					this.addToast(Strings.CREATED, Intent.SUCCESS, 'saved');
+				})
+				.catch((error) => {
+					console.log(error);
+					this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
+				})
+				.finally(() => {
+					this.setState({
+						loading: false,
+					});
+				});
+		} else {
+			this.addToast(Strings.ENTER_ONE_ROW, Intent.DANGER, 'issue');
+		}
+	};
+
+	search = (currentPage: number) => {
+		const { searchName, searchCode } = this.state;
+		this.setState({ loading: true, clicked: true });
+		this.departmentApi
+			.getDepartments(currentPage, searchName, searchCode)
+			.then((result) => {
+				this.setState({ data: result });
+			})
+			.then(() => this.departmentApi.getDepartments(currentPage + 1, searchName, searchCode))
+			.then((res) =>
+				this.setState({
+					hasNextPage: res.length > 0 ? true : false,
+				})
+			)
+			.finally(() => this.setState({ loading: false }));
 	};
 
 	clear = () => {
-		this.setState({ clicked: false, data: [] });
+		this.setState({ data: [], clicked: false });
 	};
 
 	delete = (id: number | null = null) => {
@@ -130,9 +186,31 @@ export default class DepartmentUI extends React.Component<Props, State> {
 		});
 	};
 
+	editDepartment = () => {
+		this.setState({
+			loading: true,
+		});
+		this.departmentApi
+			.editDepartment(this.state.currentDepartmentCode!, this.state.currentDepartment!)
+			.then(() => {
+				this.closeOverlay();
+				this.addToast(Strings.CREATED, Intent.SUCCESS, 'saved');
+			})
+			.catch((error) => {
+				console.log(error);
+				this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
+			})
+			.finally(() => {
+				this.setState({
+					loading: false,
+				});
+			});
+	};
+
 	deleteConfirm = () => {
 		let deleteId = this.state.delete!;
-		console.log(deleteId);
+		if (deleteId) this.departmentApi.deleteOne(deleteId);
+		else this.departmentApi.deleteAll();
 		this.setState({
 			isOpenAlert: false,
 			delete: null,
@@ -149,7 +227,6 @@ export default class DepartmentUI extends React.Component<Props, State> {
 
 	changeAddRow = (value: string, rowIndex: number, columnIndex: number) => {
 		let department = this.state.addData[rowIndex!];
-		console.log(department);
 		switch (columnIndex) {
 			case 0:
 				department.name = value;
@@ -165,7 +242,6 @@ export default class DepartmentUI extends React.Component<Props, State> {
 		if (this.state.addData.length) {
 			let value: string | number | undefined;
 			let department = this.state.addData[rowIndex];
-			console.log(this.state.addData);
 			switch (columnIndex) {
 				case 0:
 					value = department.name;
@@ -196,13 +272,15 @@ export default class DepartmentUI extends React.Component<Props, State> {
 		const {
 			loading,
 			data,
-			clicked,
 			currentPage,
 			hasNextPage,
 			isOpenAlert,
 			OverlayIsOpen,
 			currentDepartment,
 			addData,
+			clicked,
+			searchName,
+			searchCode,
 		} = this.state;
 
 		data.map((record) => (record.key = record.code));
@@ -211,6 +289,12 @@ export default class DepartmentUI extends React.Component<Props, State> {
 
 		return (
 			<>
+				<Toaster
+					position="top"
+					canEscapeKeyClear={true}
+					maxToasts={1}
+					ref={(ref: Toaster) => (this.toaster = ref)}
+				/>
 				<Overlay isOpen={OverlayIsOpen} usePortal>
 					<div className={classes} style={{ color: 'black' }}>
 						{currentDepartment ? (
@@ -295,6 +379,11 @@ export default class DepartmentUI extends React.Component<Props, State> {
 										height: '350px',
 									}}
 								>
+									{loading ? (
+										<Center style={{ zIndex: 1 }}>
+											<Spinner />
+										</Center>
+									) : null}
 									<AddTable
 										numRows={addData.length}
 										loadingOptions={
@@ -325,12 +414,22 @@ export default class DepartmentUI extends React.Component<Props, State> {
 						>
 							<Button
 								intent={Intent.DANGER}
+								disabled={loading}
 								onClick={() => this.closeOverlay()}
 								style={{ margin: '' }}
 							>
 								{Strings.CLOSE}
 							</Button>
-							<Button intent={Intent.PRIMARY} style={{ margin: '' }}>
+							<Button
+								disabled={loading}
+								intent={Intent.PRIMARY}
+								style={{ margin: '' }}
+								onClick={() =>
+									currentDepartment
+										? this.editDepartment()
+										: this.createAllDepartments()
+								}
+							>
 								{Strings.SAVE}
 							</Button>
 						</div>
@@ -367,6 +466,13 @@ export default class DepartmentUI extends React.Component<Props, State> {
 										<InputGroup
 											placeholder={Strings.ENTER_NAME_TO_SEARCH}
 											disabled={loading}
+											value={searchName ? searchName : ''}
+											onChange={(event: any) => {
+												this.setState({
+													searchName: event.target!.value,
+													searchCode: undefined,
+												});
+											}}
 										/>
 									</Col>
 								</Row>
@@ -379,6 +485,13 @@ export default class DepartmentUI extends React.Component<Props, State> {
 											placeholder={Strings.ENTER_CODE_TO_SEARCH}
 											disabled={loading}
 											min={0}
+											value={searchCode}
+											onValueChange={(val) => {
+												this.setState({
+													searchCode: val,
+													searchName: undefined,
+												});
+											}}
 										/>
 									</Col>
 								</Row>
@@ -388,7 +501,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 											text={Strings.SEARCH}
 											disabled={loading}
 											intent={Intent.PRIMARY}
-											onClick={this.search}
+											onClick={() => this.search(this.state.currentPage)}
 										/>
 									</Col>
 									<Col span={2} offset={3}>
@@ -489,10 +602,28 @@ export default class DepartmentUI extends React.Component<Props, State> {
 									<Button
 										text={`< ${Strings.PREV}`}
 										disabled={currentPage === 0}
+										onClick={() => {
+											this.setState({
+												currentPage: this.state.currentPage - 1,
+											});
+											this.search(this.state.currentPage - 1);
+										}}
 									/>
 								</Col>
 								<Col>
-									<Button text={`${Strings.NEXT} >`} disabled={hasNextPage} />
+									<CenterPage>{currentPage + 1}</CenterPage>
+								</Col>
+								<Col>
+									<Button
+										text={`${Strings.NEXT} >`}
+										disabled={!hasNextPage}
+										onClick={() => {
+											this.setState({
+												currentPage: this.state.currentPage + 1,
+											});
+											this.search(this.state.currentPage + 1);
+										}}
+									/>
 								</Col>
 							</Row>
 						</>
