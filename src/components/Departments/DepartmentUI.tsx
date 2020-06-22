@@ -44,6 +44,7 @@ export interface State {
 	isOpenAlert: boolean;
 	delete: number | null;
 	OverlayIsOpen: boolean;
+	currentDepartmentCode?: number;
 	currentDepartment: null | Department;
 }
 
@@ -80,66 +81,10 @@ export default class DepartmentUI extends React.Component<Props, State> {
 			hasNextPage: false,
 			isOpenAlert: false,
 			delete: null,
-			OverlayIsOpen: true,
+			OverlayIsOpen: false,
 			currentDepartment: null,
 			addData: [],
-			data: [
-				new Department('software1', 110),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('software1', 110),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('software1', 110),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('software1', 110),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('software1', 110),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-			],
+			data: [new Department('software1', 110)],
 		};
 	}
 	fileUploadAction = () => this.inputReference!.current!.click();
@@ -180,9 +125,9 @@ export default class DepartmentUI extends React.Component<Props, State> {
 	edit = (department: Department) => {
 		this.setState({
 			OverlayIsOpen: true,
-			currentDepartment: department,
+			currentDepartment: new Department(department.name, department.code),
+			currentDepartmentCode: department.code,
 		});
-		console.log(department.code);
 	};
 
 	deleteConfirm = () => {
@@ -204,6 +149,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 
 	changeAddRow = (value: string, rowIndex: number, columnIndex: number) => {
 		let department = this.state.addData[rowIndex!];
+		console.log(department);
 		switch (columnIndex) {
 			case 0:
 				department.name = value;
@@ -212,7 +158,6 @@ export default class DepartmentUI extends React.Component<Props, State> {
 				department.code = +value;
 				break;
 		}
-		console.log(this.state.addData);
 		// this.forceUpdate();
 	};
 
@@ -277,6 +222,13 @@ export default class DepartmentUI extends React.Component<Props, State> {
 										<InputGroup
 											placeholder={Strings.ENTER_NAME_TO_SEARCH}
 											disabled={loading}
+											value={currentDepartment.name}
+											onChange={(event: any) => {
+												currentDepartment.name = event.target!.value;
+												this.setState({
+													currentDepartment: currentDepartment,
+												});
+											}}
 										/>
 									</Col>
 								</Row>
@@ -289,6 +241,13 @@ export default class DepartmentUI extends React.Component<Props, State> {
 											placeholder={Strings.ENTER_CODE_TO_SEARCH}
 											disabled={loading}
 											min={0}
+											value={currentDepartment.code}
+											onValueChange={(value) => {
+												currentDepartment.code = value;
+												this.setState({
+													currentDepartment: currentDepartment,
+												});
+											}}
 										/>
 									</Col>
 								</Row>
