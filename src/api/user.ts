@@ -8,9 +8,11 @@ interface UserWithToken {
 }
 
 export class UserApi extends Api {
-	private readonly LOGIN = 'auth/login';
-	private readonly LOGOUT = 'auth/logout';
-	private readonly AUTH_WITH_TOKEN = 'auth';
+	private readonly BASE = 'auth';
+
+	private readonly LOGIN = `${this.BASE}/login`;
+	private readonly LOGOUT = `${this.BASE}/logout`;
+	private readonly AUTH_WITH_TOKEN = this.BASE;
 
 	public constructor(config?: AxiosRequestConfig) {
 		super(config);

@@ -32,6 +32,7 @@ export class Api {
 		this.api = axios.create(config);
 
 		this.api.interceptors.request.use((param: AxiosRequestConfig) => ({
+			// data: JSON.stringify(param.data),
 			...apiConfig,
 			...param,
 		}));

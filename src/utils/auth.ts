@@ -40,9 +40,7 @@ const setAuthToken = async (token: string): Promise<void> => {
 };
 
 const removeAuthToken = async (): Promise<{}> => {
-	const { succeed } = await ipc.send<{ succeed: boolean }, { token: string }>(
-		AuthChannels.RemoveAuthToken
-	);
+	const { succeed } = await ipc.send<{ succeed: boolean }>(AuthChannels.RemoveAuthToken);
 	if (succeed) return Promise.resolve({});
 	return Promise.reject();
 };

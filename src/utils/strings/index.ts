@@ -52,6 +52,9 @@ export interface Strings {
 	SORT_ASC: string;
 	SORT_DESC: string;
 	IMPORT_FILE: string;
+	ENTER_ONE_ROW: string;
+	CHECK_YOUR_INFO: string;
+	CREATED: string;
 }
 
 enum Languages {

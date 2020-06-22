@@ -2,6 +2,7 @@ export class Department {
 	private _name: string;
 	private _code: number;
 
+	constructor(name?: string, code?: number);
 	constructor(name: string, code: number) {
 		this.name = name;
 		this.code = code;
@@ -37,5 +38,16 @@ export class Department {
 	 */
 	public set code(value: number) {
 		this._code = value;
+	}
+
+	toJsonString(): string {
+		let json = JSON.stringify(this);
+		Object.keys(this)
+			.filter((key) => key[0] === '_')
+			.forEach((key) => {
+				json = json.replace(key, key.substring(1));
+			});
+
+		return json;
 	}
 }

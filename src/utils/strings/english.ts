@@ -52,6 +52,9 @@ const english: Strings = {
 	SORT_ASC: 'Sort Asc',
 	SORT_DESC: 'Sort Desc',
 	IMPORT_FILE: 'Import by file',
+	ENTER_ONE_ROW: 'Please enter at least one row',
+	CHECK_YOUR_INFO: 'There is problem with your info please check it and try again',
+	CREATED: 'Created!',
 };
 
 export default english;

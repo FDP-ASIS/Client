@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Strings from '../../../utils/strings';
+import Strings from '../../utils/strings';
 import {
 	H3,
 	H2,
@@ -12,13 +12,23 @@ import {
 	Alert,
 	Overlay,
 	Classes,
+	Toaster,
 } from '@blueprintjs/core';
 import styled from 'styled-components';
 import { Table, Empty, Row, Col, Space } from 'antd';
 import classNames from 'classnames';
-import { EditableCell, Column as AddColumn, Table as AddTable } from '@blueprintjs/table';
+import {
+	EditableCell,
+	Column as AddColumn,
+	Table as AddTable,
+	TableLoadingOption,
+} from '@blueprintjs/table';
+
 // import { Element } from 'react-scroll';
-import { Department } from '../../../models/department';
+import { Department } from '../../models/department';
+import { readDepartmentCSV } from '../../utils/readCSV';
+import { DepartmentApi } from '../../api/department';
+import { IconName } from '@blueprintjs/core';
 
 const { Column } = Table;
 
@@ -30,13 +40,17 @@ export interface Key {
 export interface State {
 	loading: boolean;
 	data: (Department & Key)[];
+	addData: (Department & Key)[];
 	clicked: boolean;
 	currentPage: number;
 	hasNextPage: boolean;
 	isOpenAlert: boolean;
 	delete: number | null;
 	OverlayIsOpen: boolean;
+	currentDepartmentCode?: number;
 	currentDepartment: null | Department;
+	searchName?: string | undefined;
+	searchCode?: number | undefined;
 }
 
 const OVERLAY_CLASS = 'overlay-transition';
@@ -49,6 +63,13 @@ const FillAllPage = styled.div`
 	flex-direction: column;
 `;
 
+const CenterPage = styled.div`
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+`;
+
 const Center = styled(H2)`
 	position: absolute;
 	top: 50%;
@@ -59,10 +80,13 @@ const Center = styled(H2)`
 	text-align: center;
 `;
 
-export default class SearchDepartment extends React.Component<Props, State> {
+export default class DepartmentUI extends React.Component<Props, State> {
+	inputReference: React.RefObject<HTMLInputElement> = React.createRef();
+	departmentApi: DepartmentApi;
+
 	constructor(props: Props) {
 		super(props);
-
+		this.departmentApi = new DepartmentApi();
 		this.state = {
 			loading: false,
 			clicked: false,
@@ -70,74 +94,81 @@ export default class SearchDepartment extends React.Component<Props, State> {
 			hasNextPage: false,
 			isOpenAlert: false,
 			delete: null,
-			OverlayIsOpen: true,
+			OverlayIsOpen: false,
 			currentDepartment: null,
-			data: [
-				new Department('software1', 110),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('software1', 110),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('software1', 110),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('software1', 110),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('software1', 110),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-				new Department('test', 20),
-				new Department('software', 10),
-			],
+			addData: [],
+			data: [],
 		};
 	}
+	fileUploadAction = () => this.inputReference!.current!.click();
 
-	search = () => {
-		this.setState({ clicked: true });
+	fileUploadInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (this.inputReference?.current?.files?.length) {
+			this.setState({
+				loading: true,
+			});
+			readDepartmentCSV(this.inputReference.current.files[0].path)
+				.then((res) => {
+					this.setState({ addData: res });
+				})
+				.catch()
+				.finally(() => {
+					this.setState({
+						loading: false,
+					});
+				});
+		}
+	};
+	private toaster: Toaster | undefined;
+
+	private addToast = (reason: string, color: Intent, icon: IconName) => {
+		if (this.toaster) this.toaster.show({ message: reason, intent: color, icon: icon });
+	};
+
+	createAllDepartments = () => {
+		if (this.state.addData.length) {
+			this.setState({
+				loading: true,
+			});
+			this.departmentApi
+				.create(this.state.addData)
+				.then(() => {
+					this.closeOverlay();
+					this.addToast(Strings.CREATED, Intent.SUCCESS, 'saved');
+				})
+				.catch((error) => {
+					console.log(error);
+					this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
+				})
+				.finally(() => {
+					this.setState({
+						loading: false,
+					});
+				});
+		} else {
+			this.addToast(Strings.ENTER_ONE_ROW, Intent.DANGER, 'issue');
+		}
+	};
+
+	search = (currentPage: number) => {
+		const { searchName, searchCode } = this.state;
+		this.setState({ loading: true, clicked: true });
+		this.departmentApi
+			.getDepartments(currentPage, searchName, searchCode)
+			.then((result) => {
+				this.setState({ data: result });
+			})
+			.then(() => this.departmentApi.getDepartments(currentPage + 1, searchName, searchCode))
+			.then((res) =>
+				this.setState({
+					hasNextPage: res.length > 0 ? true : false,
+				})
+			)
+			.finally(() => this.setState({ loading: false }));
 	};
 
 	clear = () => {
-		this.setState({ clicked: false });
+		this.setState({ data: [], clicked: false });
 	};
 
 	delete = (id: number | null = null) => {
@@ -150,14 +181,36 @@ export default class SearchDepartment extends React.Component<Props, State> {
 	edit = (department: Department) => {
 		this.setState({
 			OverlayIsOpen: true,
-			currentDepartment: department,
+			currentDepartment: new Department(department.name, department.code),
+			currentDepartmentCode: department.code,
 		});
-		console.log(department.code);
+	};
+
+	editDepartment = () => {
+		this.setState({
+			loading: true,
+		});
+		this.departmentApi
+			.editDepartment(this.state.currentDepartmentCode!, this.state.currentDepartment!)
+			.then(() => {
+				this.closeOverlay();
+				this.addToast(Strings.CREATED, Intent.SUCCESS, 'saved');
+			})
+			.catch((error) => {
+				console.log(error);
+				this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
+			})
+			.finally(() => {
+				this.setState({
+					loading: false,
+				});
+			});
 	};
 
 	deleteConfirm = () => {
 		let deleteId = this.state.delete!;
-		console.log(deleteId);
+		if (deleteId) this.departmentApi.deleteOne(deleteId);
+		else this.departmentApi.deleteAll();
 		this.setState({
 			isOpenAlert: false,
 			delete: null,
@@ -168,33 +221,66 @@ export default class SearchDepartment extends React.Component<Props, State> {
 		this.setState({
 			OverlayIsOpen: false,
 			currentDepartment: null,
+			addData: [] as Department[],
 		});
 	};
 
-	cellRenderer = (rowIndex: number, columnIndex: number) => {
-		let value: string | number;
-		let department = this.state.data[rowIndex];
+	changeAddRow = (value: string, rowIndex: number, columnIndex: number) => {
+		let department = this.state.addData[rowIndex!];
 		switch (columnIndex) {
 			case 0:
-				value = department.name;
+				department.name = value;
 				break;
 			case 1:
-				value = department.code;
+				department.code = +value;
 				break;
 		}
-		return <EditableCell loading={this.state.loading} value={value!.toString()} />;
+		// this.forceUpdate();
+	};
+
+	cellRenderer = (rowIndex: number, columnIndex: number) => {
+		if (this.state.addData.length) {
+			let value: string | number | undefined;
+			let department = this.state.addData[rowIndex];
+			switch (columnIndex) {
+				case 0:
+					value = department.name;
+					break;
+				case 1:
+					value = department.code;
+					break;
+			}
+			return (
+				<EditableCell
+					loading={this.state.loading}
+					onChange={(value) => this.changeAddRow(value, rowIndex, columnIndex)}
+					value={value ? value.toString() : undefined}
+				/>
+			);
+		}
+		return <EditableCell />;
+	};
+
+	addNewRow = () => {
+		this.state.addData.push(new Department());
+		this.setState({
+			addData: this.state.addData,
+		});
 	};
 
 	render() {
 		const {
 			loading,
 			data,
-			clicked,
 			currentPage,
 			hasNextPage,
 			isOpenAlert,
 			OverlayIsOpen,
 			currentDepartment,
+			addData,
+			clicked,
+			searchName,
+			searchCode,
 		} = this.state;
 
 		data.map((record) => (record.key = record.code));
@@ -203,6 +289,12 @@ export default class SearchDepartment extends React.Component<Props, State> {
 
 		return (
 			<>
+				<Toaster
+					position="top"
+					canEscapeKeyClear={true}
+					maxToasts={1}
+					ref={(ref: Toaster) => (this.toaster = ref)}
+				/>
 				<Overlay isOpen={OverlayIsOpen} usePortal>
 					<div className={classes} style={{ color: 'black' }}>
 						{currentDepartment ? (
@@ -214,6 +306,13 @@ export default class SearchDepartment extends React.Component<Props, State> {
 										<InputGroup
 											placeholder={Strings.ENTER_NAME_TO_SEARCH}
 											disabled={loading}
+											value={currentDepartment.name}
+											onChange={(event: any) => {
+												currentDepartment.name = event.target!.value;
+												this.setState({
+													currentDepartment: currentDepartment,
+												});
+											}}
 										/>
 									</Col>
 								</Row>
@@ -226,6 +325,13 @@ export default class SearchDepartment extends React.Component<Props, State> {
 											placeholder={Strings.ENTER_CODE_TO_SEARCH}
 											disabled={loading}
 											min={0}
+											value={currentDepartment.code}
+											onValueChange={(value) => {
+												currentDepartment.code = value;
+												this.setState({
+													currentDepartment: currentDepartment,
+												});
+											}}
 										/>
 									</Col>
 								</Row>
@@ -247,9 +353,16 @@ export default class SearchDepartment extends React.Component<Props, State> {
 												fill={true}
 												disabled={loading}
 												text={Strings.ADD_NEW_ROW}
-												onClick={() => {}}
+												onClick={() => this.addNewRow()}
 											/>
 										</div>
+										<input
+											type="file"
+											accept={'.csv'}
+											hidden
+											ref={this.inputReference}
+											onChange={this.fileUploadInputChange}
+										/>
 										<Button
 											intent={Intent.PRIMARY}
 											rightIcon={'import'}
@@ -257,7 +370,7 @@ export default class SearchDepartment extends React.Component<Props, State> {
 											fill={true}
 											disabled={loading}
 											text={Strings.IMPORT_FILE}
-											onClick={() => {}}
+											onClick={this.fileUploadAction}
 										/>
 									</Col>
 								</Row>
@@ -266,7 +379,23 @@ export default class SearchDepartment extends React.Component<Props, State> {
 										height: '350px',
 									}}
 								>
-									<AddTable numRows={data.length}>
+									{loading ? (
+										<Center style={{ zIndex: 1 }}>
+											<Spinner />
+										</Center>
+									) : null}
+									<AddTable
+										numRows={addData.length}
+										loadingOptions={
+											loading
+												? [
+														TableLoadingOption.CELLS,
+														TableLoadingOption.COLUMN_HEADERS,
+														TableLoadingOption.ROW_HEADERS,
+												  ]
+												: []
+										}
+									>
 										<AddColumn
 											name={Strings.NAME}
 											cellRenderer={this.cellRenderer}
@@ -285,12 +414,22 @@ export default class SearchDepartment extends React.Component<Props, State> {
 						>
 							<Button
 								intent={Intent.DANGER}
+								disabled={loading}
 								onClick={() => this.closeOverlay()}
 								style={{ margin: '' }}
 							>
 								{Strings.CLOSE}
 							</Button>
-							<Button intent={Intent.PRIMARY} style={{ margin: '' }}>
+							<Button
+								disabled={loading}
+								intent={Intent.PRIMARY}
+								style={{ margin: '' }}
+								onClick={() =>
+									currentDepartment
+										? this.editDepartment()
+										: this.createAllDepartments()
+								}
+							>
 								{Strings.SAVE}
 							</Button>
 						</div>
@@ -327,6 +466,13 @@ export default class SearchDepartment extends React.Component<Props, State> {
 										<InputGroup
 											placeholder={Strings.ENTER_NAME_TO_SEARCH}
 											disabled={loading}
+											value={searchName ? searchName : ''}
+											onChange={(event: any) => {
+												this.setState({
+													searchName: event.target!.value,
+													searchCode: undefined,
+												});
+											}}
 										/>
 									</Col>
 								</Row>
@@ -339,6 +485,13 @@ export default class SearchDepartment extends React.Component<Props, State> {
 											placeholder={Strings.ENTER_CODE_TO_SEARCH}
 											disabled={loading}
 											min={0}
+											value={searchCode}
+											onValueChange={(val) => {
+												this.setState({
+													searchCode: val,
+													searchName: undefined,
+												});
+											}}
 										/>
 									</Col>
 								</Row>
@@ -348,7 +501,7 @@ export default class SearchDepartment extends React.Component<Props, State> {
 											text={Strings.SEARCH}
 											disabled={loading}
 											intent={Intent.PRIMARY}
-											onClick={this.search}
+											onClick={() => this.search(this.state.currentPage)}
 										/>
 									</Col>
 									<Col span={2} offset={3}>
@@ -449,10 +602,28 @@ export default class SearchDepartment extends React.Component<Props, State> {
 									<Button
 										text={`< ${Strings.PREV}`}
 										disabled={currentPage === 0}
+										onClick={() => {
+											this.setState({
+												currentPage: this.state.currentPage - 1,
+											});
+											this.search(this.state.currentPage - 1);
+										}}
 									/>
 								</Col>
 								<Col>
-									<Button text={`${Strings.NEXT} >`} disabled={hasNextPage} />
+									<CenterPage>{currentPage + 1}</CenterPage>
+								</Col>
+								<Col>
+									<Button
+										text={`${Strings.NEXT} >`}
+										disabled={!hasNextPage}
+										onClick={() => {
+											this.setState({
+												currentPage: this.state.currentPage + 1,
+											});
+											this.search(this.state.currentPage + 1);
+										}}
+									/>
 								</Col>
 							</Row>
 						</>
