@@ -2,6 +2,7 @@ export class Department {
 	private _name: string;
 	private _code: number;
 
+	constructor(name?: string, code?: number);
 	constructor(name: string, code: number) {
 		this.name = name;
 		this.code = code;
