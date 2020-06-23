@@ -6,7 +6,7 @@ import MyCourses from '../MyCourses';
 import EnrollToCourse from '../EnrollToCourse';
 import Users from '../Users';
 import Courses from '../Courses';
-import Departments from '../Departments';
+// import Departments from '../Departments';
 import Profile from '../Profile';
 import AboutUs from '../AboutUs';
 import Settings from '../Settings';
@@ -41,11 +41,11 @@ export const dashRoutes: pages[] = [
 		component: Users,
 		onlyRole: [Role.ADMIN],
 	},
-	{
-		path: RoutesPath.Departments,
-		component: Departments,
-		onlyRole: [Role.ADMIN],
-	},
+	// {
+	// 	path: RoutesPath.Departments,
+	// 	component: Departments,
+	// 	onlyRole: [Role.ADMIN],
+	// },
 	{
 		path: RoutesPath.Profile,
 		component: Profile,

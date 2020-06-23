@@ -38,7 +38,7 @@ export class DepartmentApi extends Api {
 		return this.post<R, Department[]>(this.CREATE, departments);
 	}
 
-	public async getDepartments<R = Department[]>(
+	public getDepartments<R = Department[]>(
 		page: number,
 		name?: string,
 		code?: number
@@ -72,8 +72,4 @@ export class DepartmentApi extends Api {
 	}
 }
 
-export const userApi = new DepartmentApi();
-interface DepartmentProps {
-	name: string;
-	code: number;
-}
+export const departmentApi = new DepartmentApi();

@@ -70,13 +70,13 @@ export class Name {
 }
 
 export class User {
-	private _id: String;
+	private _id: string;
 	private _name: Name;
-	private _username: String;
-	private _email: String;
+	private _username: string;
+	private _email: string;
 	private _role: Role;
 
-	constructor(id: String, name: Name, username: String, email: String, role: Role) {
+	constructor(id: string, name: Name, username: string, email: string, role: Role) {
 		this.id = id;
 		this.name = name;
 		this.username = username;
@@ -86,17 +86,17 @@ export class User {
 
 	/**
 	 * Getter id
-	 * @return {String}
+	 * @return {string}
 	 */
-	public get id(): String {
+	public get id(): string {
 		return this._id;
 	}
 
 	/**
 	 * Setter id
-	 * @param {String} value
+	 * @param {string} value
 	 */
-	public set id(value: String) {
+	public set id(value: string) {
 		this._id = value;
 	}
 
@@ -118,33 +118,33 @@ export class User {
 
 	/**
 	 * Getter username
-	 * @return {String}
+	 * @return {string}
 	 */
-	public get username(): String {
+	public get username(): string {
 		return this._username;
 	}
 
 	/**
 	 * Setter username
-	 * @param {String} value
+	 * @param {string} value
 	 */
-	public set username(value: String) {
+	public set username(value: string) {
 		this._username = value;
 	}
 
 	/**
 	 * Getter email
-	 * @return {String}
+	 * @return {string}
 	 */
-	public get email(): String {
+	public get email(): string {
 		return this._email;
 	}
 
 	/**
 	 * Setter email
-	 * @param {String} value
+	 * @param {string} value
 	 */
-	public set email(value: String) {
+	public set email(value: string) {
 		this._email = value;
 	}
 

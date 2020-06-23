@@ -35,11 +35,11 @@ const adminMenus: MenuTabProps[] = [
 		link: RoutesPath.Courses,
 		icon: 'learning',
 	},
-	{
-		name: Strings.DEPARTMENTS,
-		link: RoutesPath.Departments,
-		icon: 'projects',
-	},
+	// {
+	// 	name: Strings.DEPARTMENTS,
+	// 	link: RoutesPath.Departments,
+	// 	icon: 'projects',
+	// },
 ];
 
 export const getMenu = (role: Role): MenuTabProps[] => {
