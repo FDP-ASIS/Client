@@ -55,6 +55,11 @@ const english: Strings = {
 	ENTER_ONE_ROW: 'Please enter at least one row',
 	CHECK_YOUR_INFO: 'There is problem with your info please check it and try again',
 	CREATED: 'Created!',
+	DELETE_ALL_COURSE: 'Delete all courses',
+	ADD_NEW_COURSE: 'Add new course',
+	SEARCH_COURSE: 'Search course',
+	ADD_COURSE: 'Add course',
+	EDIT_COURSE: 'Edit course',
 };
 
 export default english;

@@ -55,6 +55,11 @@ export interface Strings {
 	ENTER_ONE_ROW: string;
 	CHECK_YOUR_INFO: string;
 	CREATED: string;
+	DELETE_ALL_COURSE: string;
+	ADD_NEW_COURSE: string;
+	SEARCH_COURSE: string;
+	ADD_COURSE: string;
+	EDIT_COURSE: string;
 }
 
 enum Languages {

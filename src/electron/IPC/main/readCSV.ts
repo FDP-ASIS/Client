@@ -3,7 +3,7 @@ import { AbstractChannel } from './abstractChannel';
 import { IpcRequest } from '../../shared/IpcRequest';
 import { ReadCSVChannels } from '../channels/readCSV';
 
-import { readDepartmentCSV } from '../../tools/readCSV';
+import { readDepartmentCSV, readCourseCSV } from '../../tools/readCSV';
 
 export class ReadDepartmentCSVChannel extends AbstractChannel {
 	getName(): string {
@@ -13,6 +13,18 @@ export class ReadDepartmentCSVChannel extends AbstractChannel {
 	async handleRequest(event: IpcMainEvent, request: IpcRequest<{ path: string }>): Promise<void> {
 		event.sender.send(request.responseChannel!, {
 			result: await readDepartmentCSV(request.params!.path),
+		});
+	}
+}
+
+export class ReadCourseCSVChannel extends AbstractChannel {
+	getName(): string {
+		return ReadCSVChannels.ReadCourse;
+	}
+
+	async handleRequest(event: IpcMainEvent, request: IpcRequest<{ path: string }>): Promise<void> {
+		event.sender.send(request.responseChannel!, {
+			result: await readCourseCSV(request.params!.path),
 		});
 	}
 }

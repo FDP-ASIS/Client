@@ -1,12 +1,24 @@
 import { IpcService } from '../electron/IPC/renderer/ipcService';
 import { ReadCSVChannels } from '../electron/IPC/channels/readCSV';
 import { Department } from '../models/department';
+import { Course } from '../models/course';
 
 const ipc = new IpcService();
 
 export const readDepartmentCSV = async (path: string): Promise<Department[]> => {
 	const { result } = await ipc.send<{ result: Department[] }, { path: string }>(
 		ReadCSVChannels.ReadDepartment,
+		{
+			params: { path },
+		}
+	);
+	if (result) return Promise.resolve(result);
+	return Promise.reject();
+};
+
+export const readCourseCSV = async (path: string): Promise<Course[]> => {
+	const { result } = await ipc.send<{ result: Course[] }, { path: string }>(
+		ReadCSVChannels.ReadCourse,
 		{
 			params: { path },
 		}

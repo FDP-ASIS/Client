@@ -25,9 +25,9 @@ import {
 } from '@blueprintjs/table';
 
 // import { Element } from 'react-scroll';
-import { Department } from '../../models/department';
-import { readDepartmentCSV } from '../../utils/readCSV';
-import { DepartmentApi } from '../../api/department';
+import { Course } from '../../models/course';
+import { readCourseCSV } from '../../utils/readCSV';
+import { CourseApi } from '../../api/course';
 import { IconName } from '@blueprintjs/core';
 
 const { Column } = Table;
@@ -39,16 +39,16 @@ export interface Key {
 
 export interface State {
 	loading: boolean;
-	data: (Department & Key)[];
-	addData: (Department & Key)[];
+	data: (Course & Key)[];
+	addData: (Course & Key)[];
 	clicked: boolean;
 	currentPage: number;
 	hasNextPage: boolean;
 	isOpenAlert: boolean;
 	delete: number | null;
 	OverlayIsOpen: boolean;
-	currentDepartmentCode?: number;
-	currentDepartment: null | Department;
+	currentCourseCode?: number;
+	currentCourse: null | Course;
 	searchName?: string | undefined;
 	searchCode?: number | undefined;
 }
@@ -80,13 +80,13 @@ const Center = styled(H2)`
 	text-align: center;
 `;
 
-export default class DepartmentUI extends React.Component<Props, State> {
+export default class CoursesUI extends React.Component<Props, State> {
 	inputReference: React.RefObject<HTMLInputElement> = React.createRef();
-	departmentApi: DepartmentApi;
+	courseApi: CourseApi;
 
 	constructor(props: Props) {
 		super(props);
-		this.departmentApi = new DepartmentApi();
+		this.courseApi = new CourseApi();
 		this.state = {
 			loading: false,
 			clicked: false,
@@ -95,9 +95,9 @@ export default class DepartmentUI extends React.Component<Props, State> {
 			isOpenAlert: false,
 			delete: null,
 			OverlayIsOpen: false,
-			currentDepartment: null,
+			currentCourse: null,
 			addData: [],
-			data: [],
+			data: [new Course('course', 12345)],
 		};
 	}
 	fileUploadAction = () => this.inputReference!.current!.click();
@@ -107,7 +107,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 			this.setState({
 				loading: true,
 			});
-			readDepartmentCSV(this.inputReference.current.files[0].path)
+			readCourseCSV(this.inputReference.current.files[0].path)
 				.then((res) => {
 					this.setState({ addData: res });
 				})
@@ -125,12 +125,12 @@ export default class DepartmentUI extends React.Component<Props, State> {
 		if (this.toaster) this.toaster.show({ message: reason, intent: color, icon: icon });
 	};
 
-	createAllDepartments = () => {
+	createAllCourses = () => {
 		if (this.state.addData.length) {
 			this.setState({
 				loading: true,
 			});
-			this.departmentApi
+			this.courseApi
 				.create(this.state.addData)
 				.then(() => {
 					this.closeOverlay();
@@ -150,15 +150,17 @@ export default class DepartmentUI extends React.Component<Props, State> {
 		}
 	};
 
-	search = (currentPage: number) => {
+	search = (currentPage?: number) => {
+		if (!currentPage) currentPage = this.state.currentPage;
+
 		const { searchName, searchCode } = this.state;
 		this.setState({ loading: true, clicked: true });
-		this.departmentApi
-			.getDepartments(currentPage, searchName, searchCode)
+		this.courseApi
+			.getCourses(currentPage, searchName, searchCode)
 			.then((result) => {
 				this.setState({ data: result });
 			})
-			.then(() => this.departmentApi.getDepartments(currentPage + 1, searchName, searchCode))
+			.then(() => this.courseApi.getCourses(currentPage! + 1, searchName, searchCode))
 			.then((res) =>
 				this.setState({
 					hasNextPage: res.length > 0 && searchName !== undefined ? true : false,
@@ -178,22 +180,23 @@ export default class DepartmentUI extends React.Component<Props, State> {
 		});
 	};
 
-	edit = (department: Department) => {
+	edit = (course: Course) => {
 		this.setState({
 			OverlayIsOpen: true,
-			currentDepartment: new Department(department.name, department.code),
-			currentDepartmentCode: department.code,
+			currentCourse: new Course(course.name, course.code),
+			currentCourseCode: course.code,
 		});
 	};
 
-	editDepartment = () => {
+	editCourse = () => {
 		this.setState({
 			loading: true,
 		});
-		this.departmentApi
-			.editDepartment(this.state.currentDepartmentCode!, this.state.currentDepartment!)
+		this.courseApi
+			.editCourse(this.state.currentCourseCode!, this.state.currentCourse!)
 			.then(() => {
 				this.closeOverlay();
+				this.search();
 				this.addToast(Strings.CREATED, Intent.SUCCESS, 'saved');
 			})
 			.catch((error) => {
@@ -209,30 +212,31 @@ export default class DepartmentUI extends React.Component<Props, State> {
 
 	deleteConfirm = () => {
 		let deleteId = this.state.delete!;
-		if (deleteId) this.departmentApi.deleteOne(deleteId);
-		else this.departmentApi.deleteAll();
+		if (deleteId) this.courseApi.deleteOne(deleteId);
+		else this.courseApi.deleteAll();
 		this.setState({
 			isOpenAlert: false,
 			delete: null,
 		});
+		this.search();
 	};
 
 	closeOverlay = () => {
 		this.setState({
 			OverlayIsOpen: false,
-			currentDepartment: null,
-			addData: [] as Department[],
+			currentCourse: null,
+			addData: [] as Course[],
 		});
 	};
 
 	changeAddRow = (value: string, rowIndex: number, columnIndex: number) => {
-		let department = this.state.addData[rowIndex!];
+		let course = this.state.addData[rowIndex!];
 		switch (columnIndex) {
 			case 0:
-				department.name = value;
+				course.name = value;
 				break;
 			case 1:
-				department.code = +value;
+				course.code = +value;
 				break;
 		}
 		// this.forceUpdate();
@@ -241,13 +245,13 @@ export default class DepartmentUI extends React.Component<Props, State> {
 	cellRenderer = (rowIndex: number, columnIndex: number) => {
 		if (this.state.addData.length) {
 			let value: string | number | undefined;
-			let department = this.state.addData[rowIndex];
+			let course = this.state.addData[rowIndex];
 			switch (columnIndex) {
 				case 0:
-					value = department.name;
+					value = course.name;
 					break;
 				case 1:
-					value = department.code;
+					value = course.code;
 					break;
 			}
 			return (
@@ -262,7 +266,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 	};
 
 	addNewRow = () => {
-		this.state.addData.push(new Department());
+		this.state.addData.push(new Course());
 		this.setState({
 			addData: this.state.addData,
 		});
@@ -276,7 +280,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 			hasNextPage,
 			isOpenAlert,
 			OverlayIsOpen,
-			currentDepartment,
+			currentCourse,
 			addData,
 			clicked,
 			searchName,
@@ -297,20 +301,20 @@ export default class DepartmentUI extends React.Component<Props, State> {
 				/>
 				<Overlay isOpen={OverlayIsOpen} usePortal>
 					<div className={classes} style={{ color: 'black' }}>
-						{currentDepartment ? (
+						{currentCourse ? (
 							<>
-								<H3 style={{ marginBottom: '20px' }}>{Strings.EDIT_DEPARTMENT}</H3>
+								<H3 style={{ marginBottom: '20px' }}>{Strings.EDIT_COURSE}</H3>
 								<Row gutter={[20, 16]}>
 									<Col span={3}>{Strings.NAME}:</Col>
 									<Col span={16}>
 										<InputGroup
 											placeholder={Strings.ENTER_NAME_TO_SEARCH}
 											disabled={loading}
-											value={currentDepartment.name}
+											value={currentCourse.name}
 											onChange={(event: any) => {
-												currentDepartment.name = event.target!.value;
+												currentCourse.name = event.target!.value;
 												this.setState({
-													currentDepartment: currentDepartment,
+													currentCourse: currentCourse,
 												});
 											}}
 										/>
@@ -325,11 +329,11 @@ export default class DepartmentUI extends React.Component<Props, State> {
 											placeholder={Strings.ENTER_CODE_TO_SEARCH}
 											disabled={loading}
 											min={0}
-											value={currentDepartment.code}
+											value={currentCourse.code}
 											onValueChange={(value) => {
-												currentDepartment.code = value;
+												currentCourse.code = value;
 												this.setState({
-													currentDepartment: currentDepartment,
+													currentCourse: currentCourse,
 												});
 											}}
 										/>
@@ -341,7 +345,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 								<Row>
 									<Col span={10}>
 										<H3 style={{ marginBottom: '20px' }}>
-											{Strings.ADD_DEPARTMENT}
+											{Strings.ADD_COURSE}
 										</H3>
 									</Col>
 									<Col span={6} offset={8} style={{ marginBottom: '5%' }}>
@@ -425,9 +429,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 								intent={Intent.PRIMARY}
 								style={{ margin: '' }}
 								onClick={() =>
-									currentDepartment
-										? this.editDepartment()
-										: this.createAllDepartments()
+									currentCourse ? this.editCourse() : this.createAllCourses()
 								}
 							>
 								{Strings.SAVE}
@@ -458,7 +460,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 				<FillAllPage>
 					<Row gutter={[6, 6]}>
 						<Col span={16}>
-							<H3>{Strings.SEARCH_DEPARTMENT}</H3>
+							<H3>{Strings.SEARCH_COURSE}</H3>
 							<div style={{ marginTop: '5%' }}>
 								<Row gutter={[20, 16]}>
 									<Col span={3}>{Strings.NAME}:</Col>
@@ -501,7 +503,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 											text={Strings.SEARCH}
 											disabled={loading}
 											intent={Intent.PRIMARY}
-											onClick={() => this.search(this.state.currentPage)}
+											onClick={() => this.search()}
 										/>
 									</Col>
 									<Col span={2} offset={3}>
@@ -515,7 +517,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 								</Row>
 							</div>
 						</Col>
-						<Col span={8}>
+						<Col span={7} offset={1}>
 							<div style={{ marginBottom: '10%' }}>
 								<Button
 									intent={Intent.SUCCESS}
@@ -523,7 +525,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 									rightIcon={'add'}
 									fill={true}
 									disabled={loading}
-									text={Strings.ADD_NEW_DEPARTMENT}
+									text={Strings.ADD_NEW_COURSE}
 									onClick={() =>
 										this.setState({
 											OverlayIsOpen: true,
@@ -537,7 +539,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 								alignText={Alignment.LEFT}
 								fill={true}
 								disabled={loading}
-								text={Strings.DELETE_ALL_DEPARTMENT}
+								text={Strings.DELETE_ALL_COURSE}
 								onClick={() =>
 									this.setState({
 										isOpenAlert: true,
@@ -581,7 +583,7 @@ export default class DepartmentUI extends React.Component<Props, State> {
 									align="center"
 									title={Strings.ACTIONS}
 									key="action"
-									render={(text, record: Department) => (
+									render={(text, record: Course) => (
 										<Space size="middle">
 											<Button
 												text={Strings.EDIT}
