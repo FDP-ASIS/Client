@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Strings from '../../utils/strings';
 import {
+	H4,
 	H3,
 	H2,
 	Button,
@@ -29,6 +30,7 @@ import { Course } from '../../models/course';
 import { readCourseCSV } from '../../utils/readCSV';
 import { CourseApi } from '../../api/course';
 import { IconName } from '@blueprintjs/core';
+import { User } from '../../models/user';
 
 const { Column } = Table;
 
@@ -51,6 +53,9 @@ export interface State {
 	currentCourse: null | Course;
 	searchName?: string | undefined;
 	searchCode?: number | undefined;
+	assignLecturer: boolean;
+	lecturerID?: string | undefined;
+	addedLecturer?: boolean;
 }
 
 const OVERLAY_CLASS = 'overlay-transition';
@@ -96,8 +101,9 @@ export default class CoursesUI extends React.Component<Props, State> {
 			delete: null,
 			OverlayIsOpen: false,
 			currentCourse: null,
+			assignLecturer: false,
 			addData: [],
-			data: [new Course('course', 12345)],
+			data: [],
 		};
 	}
 	fileUploadAction = () => this.inputReference!.current!.click();
@@ -134,7 +140,7 @@ export default class CoursesUI extends React.Component<Props, State> {
 				.create(this.state.addData)
 				.then(() => {
 					this.closeOverlay();
-					this.addToast(Strings.CREATED, Intent.SUCCESS, 'saved');
+					this.addToast(Strings.CREATED, Intent.SUCCESS, 'thumbs-up');
 				})
 				.catch((error) => {
 					console.log(error);
@@ -222,10 +228,13 @@ export default class CoursesUI extends React.Component<Props, State> {
 	};
 
 	closeOverlay = () => {
+		if (this.state.addedLecturer) this.search();
 		this.setState({
 			OverlayIsOpen: false,
 			currentCourse: null,
 			addData: [] as Course[],
+			assignLecturer: false,
+			addedLecturer: false,
 		});
 	};
 
@@ -270,6 +279,49 @@ export default class CoursesUI extends React.Component<Props, State> {
 		this.setState({
 			addData: this.state.addData,
 		});
+		this.search();
+	};
+
+	assignLecturer = (course: Course) => {
+		this.setState({
+			OverlayIsOpen: true,
+			currentCourse: course,
+			assignLecturer: true,
+		});
+	};
+
+	assignLecturerConfirm = () => {
+		const { currentCourse, lecturerID } = this.state;
+		this.setState({ loading: true });
+		this.courseApi
+			.assignLecturer(currentCourse!.code, lecturerID!)
+			.then((res) => {
+				this.courseApi
+					.getCourses(0, undefined, currentCourse!.code)
+					.then((res) => {
+						this.setState({
+							addedLecturer: true,
+							currentCourse: res[0],
+							lecturerID: '',
+						});
+						this.addToast(Strings.ADDED, Intent.SUCCESS, 'thumbs-up');
+					})
+					.catch((error) => {
+						console.log(error);
+						this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
+					});
+			})
+			.catch((error) => {
+				console.log(error);
+				this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
+			})
+			.finally(() => {
+				this.setState({ loading: false });
+			});
+	};
+
+	removeLecturer = (id: string) => {
+		console.log(id);
 	};
 
 	render() {
@@ -285,6 +337,8 @@ export default class CoursesUI extends React.Component<Props, State> {
 			clicked,
 			searchName,
 			searchCode,
+			assignLecturer,
+			lecturerID,
 		} = this.state;
 
 		data.map((record) => (record.key = record.code));
@@ -302,44 +356,111 @@ export default class CoursesUI extends React.Component<Props, State> {
 				<Overlay isOpen={OverlayIsOpen} usePortal>
 					<div className={classes} style={{ color: 'black' }}>
 						{currentCourse ? (
-							<>
-								<H3 style={{ marginBottom: '20px' }}>{Strings.EDIT_COURSE}</H3>
-								<Row gutter={[20, 16]}>
-									<Col span={3}>{Strings.NAME}:</Col>
-									<Col span={16}>
-										<InputGroup
-											placeholder={Strings.ENTER_NAME_TO_SEARCH}
-											disabled={loading}
-											value={currentCourse.name}
-											onChange={(event: any) => {
-												currentCourse.name = event.target!.value;
-												this.setState({
-													currentCourse: currentCourse,
-												});
-											}}
+							assignLecturer ? (
+								<>
+									<H3 style={{ marginBottom: '20px' }}>
+										{Strings.ASSIGN_LECTURER}
+									</H3>
+									<Row gutter={[20, 6]}>
+										<Col span={2}>{Strings.NAME}:</Col>
+										<Col span={8}>{currentCourse.name}</Col>
+									</Row>
+									<Row gutter={[20, 16]}>
+										<Col span={2}>{Strings.CODE}:</Col>
+										<Col span={8}>{currentCourse.code}</Col>
+									</Row>
+									<Row gutter={[20, 16]}>
+										<Col span={8}>
+											<H4>{Strings.ADD_LECTURER_BY_ID}: </H4>
+										</Col>
+										<Col span={8}>
+											<InputGroup
+												placeholder={Strings.LECTURER_ID}
+												disabled={loading}
+												value={lecturerID}
+												onChange={(event: any) => {
+													this.setState({
+														lecturerID: event.target!.value,
+													});
+												}}
+											/>
+										</Col>
+										<Col offset={1}>
+											<Button
+												intent={Intent.PRIMARY}
+												disabled={loading}
+												onClick={() => this.assignLecturerConfirm()}
+												text={Strings.ADD}
+											/>
+										</Col>
+									</Row>
+									<Table
+										bordered
+										size="small"
+										dataSource={currentCourse.lecturers}
+										scroll={{ x: true, y: 320 }}
+										style={{ marginBottom: 20 }}
+									>
+										<Column title={Strings.ID} dataIndex="id" key="id" />
+										<Column
+											title={Strings.USERNAME}
+											dataIndex="username"
+											key="username"
 										/>
-									</Col>
-								</Row>
-								<Row gutter={[6, 24]}>
-									<Col span={3}>{Strings.CODE}:</Col>
-									<Col span={16}>
-										<NumericInput
-											allowNumericCharactersOnly={true}
-											fill={true}
-											placeholder={Strings.ENTER_CODE_TO_SEARCH}
-											disabled={loading}
-											min={0}
-											value={currentCourse.code}
-											onValueChange={(value) => {
-												currentCourse.code = value;
-												this.setState({
-													currentCourse: currentCourse,
-												});
-											}}
+										<Column
+											align="center"
+											title={Strings.ACTIONS}
+											key="action"
+											render={(text, record: User) => (
+												<Button
+													text={Strings.DELETE}
+													intent={Intent.DANGER}
+													onClick={() => this.removeLecturer(record.id)}
+												/>
+											)}
 										/>
-									</Col>
-								</Row>
-							</>
+									</Table>
+								</>
+							) : (
+								<>
+									<H3 style={{ marginBottom: '20px' }}>{Strings.EDIT_COURSE}</H3>
+									<Row gutter={[20, 16]}>
+										<Col span={3}>{Strings.NAME}:</Col>
+										<Col span={16}>
+											<InputGroup
+												placeholder={Strings.ENTER_NAME_TO_SEARCH}
+												disabled={loading}
+												value={currentCourse.name}
+												onChange={(event: any) => {
+													currentCourse.name = event.target!.value;
+													this.setState({
+														currentCourse: currentCourse,
+													});
+												}}
+											/>
+										</Col>
+									</Row>
+									<Row gutter={[6, 24]}>
+										<Col span={3}>{Strings.CODE}:</Col>
+										<Col span={16}>
+											<NumericInput
+												allowNumericCharactersOnly={true}
+												fill={true}
+												placeholder={Strings.ENTER_CODE_TO_SEARCH}
+												disabled={loading}
+												min={0}
+												value={currentCourse.code}
+												onValueChange={(value) => {
+													currentCourse.code = value;
+													this.setState({
+														currentCourse: currentCourse,
+													});
+												}}
+											/>
+										</Col>
+									</Row>
+								</>
+							)
 						) : (
 							<>
 								<Row>
@@ -421,19 +542,19 @@ export default class CoursesUI extends React.Component<Props, State> {
 								disabled={loading}
 								onClick={() => this.closeOverlay()}
 								style={{ margin: '' }}
-							>
-								{Strings.CLOSE}
-							</Button>
-							<Button
-								disabled={loading}
-								intent={Intent.PRIMARY}
-								style={{ margin: '' }}
-								onClick={() =>
-									currentCourse ? this.editCourse() : this.createAllCourses()
-								}
-							>
-								{Strings.SAVE}
-							</Button>
+								text={Strings.CLOSE}
+							/>
+							{assignLecturer ? null : (
+								<Button
+									disabled={loading}
+									intent={Intent.PRIMARY}
+									style={{ margin: '' }}
+									text={Strings.SAVE}
+									onClick={() =>
+										currentCourse ? this.editCourse() : this.createAllCourses()
+									}
+								/>
+							)}
 						</div>
 					</div>
 				</Overlay>
@@ -585,6 +706,11 @@ export default class CoursesUI extends React.Component<Props, State> {
 									key="action"
 									render={(text, record: Course) => (
 										<Space size="middle">
+											<Button
+												text={Strings.ASSIGN_LECTURER}
+												intent={Intent.PRIMARY}
+												onClick={() => this.assignLecturer(record)}
+											/>
 											<Button
 												text={Strings.EDIT}
 												intent={Intent.WARNING}

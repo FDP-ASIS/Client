@@ -60,6 +60,12 @@ export interface Strings {
 	SEARCH_COURSE: string;
 	ADD_COURSE: string;
 	EDIT_COURSE: string;
+	ASSIGN_LECTURER: string;
+	ADD_LECTURER_BY_ID: string;
+	LECTURER_ID: string;
+	ADD: string;
+	ADDED: string;
+	ID: string;
 }
 
 enum Languages {

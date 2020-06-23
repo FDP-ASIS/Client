@@ -60,6 +60,12 @@ const english: Strings = {
 	SEARCH_COURSE: 'Search course',
 	ADD_COURSE: 'Add course',
 	EDIT_COURSE: 'Edit course',
+	ASSIGN_LECTURER: 'Assign lecturer',
+	ADD_LECTURER_BY_ID: 'Add lecturer by id',
+	LECTURER_ID: 'Lecturer id',
+	ADD: 'Add',
+	ADDED: 'Added',
+	ID: 'ID',
 };
 
 export default english;

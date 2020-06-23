@@ -6,28 +6,28 @@ export class Course extends Json {
 	private _name: string;
 	private _code: number;
 	private _students: User[];
-	private _lecturer: User[];
+	private _lecturers: User[];
 	private _software: Software[];
 
 	constructor(
 		name?: string,
 		code?: number,
 		students?: User[],
-		lecturer?: User[],
+		lecturers?: User[],
 		software?: Software[]
 	);
 	constructor(
 		name: string,
 		code: number,
 		students: User[],
-		lecturer: User[],
+		lecturers: User[],
 		software: Software[]
 	) {
 		super();
 		this._name = name;
 		this._code = code;
 		this._students = students;
-		this._lecturer = lecturer;
+		this._lecturers = lecturers;
 		this._software = software;
 	}
 
@@ -59,8 +59,8 @@ export class Course extends Json {
 	 * Getter lecturer
 	 * @return {User[]}
 	 */
-	public get lecturer(): User[] {
-		return this._lecturer;
+	public get lecturers(): User[] {
+		return this._lecturers;
 	}
 
 	/**
@@ -99,8 +99,8 @@ export class Course extends Json {
 	 * Setter lecturer
 	 * @param {User[]} value
 	 */
-	public set lecturer(value: User[]) {
-		this._lecturer = value;
+	public set lecturers(value: User[]) {
+		this._lecturers = value;
 	}
 
 	/**

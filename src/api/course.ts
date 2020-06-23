@@ -72,6 +72,10 @@ export class CourseApi extends Api {
 	public deleteAll() {
 		return this.delete(this.DELETE_ALL_COURSES);
 	}
+
+	public assignLecturer<R = Course>(courseCode: number, lecturerId: string): Promise<R> {
+		return this.patch(this.ASSIGN_LECTURER + courseCode + '/' + lecturerId);
+	}
 }
 
 export const courseApi = new CourseApi();
