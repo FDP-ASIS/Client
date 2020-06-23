@@ -64,6 +64,10 @@ export class UserApi extends Api {
 	}
 
 	public register<R = User[]>(users: R, userRole: Role): Promise<R> {
+		((users as unknown) as User[]).map(
+			(user) => (user.name = JSON.parse(user.name.toJsonString()))
+		);
+		// ((users as unknown) as User[]).filter((user) => user);
 		return this.post<R, R>(this.REGISTER_USERS + Role[userRole], users);
 	}
 

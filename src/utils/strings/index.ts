@@ -80,6 +80,9 @@ export interface Strings {
 	ENTER_FIRST_NAME: string;
 	ENTER_LAST_NAME: string;
 	ENTER_EMAIL: string;
+	ROLE: string;
+	NO_SELECTION: string;
+	PLEASE_ENTER_ROLE: string;
 }
 
 enum Languages {

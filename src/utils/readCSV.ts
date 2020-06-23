@@ -2,7 +2,7 @@ import { IpcService } from '../electron/IPC/renderer/ipcService';
 import { ReadCSVChannels } from '../electron/IPC/channels/readCSV';
 import { Department } from '../models/department';
 import { Course } from '../models/course';
-import { User } from '../models/user';
+import { User, Name } from '../models/user';
 
 const ipc = new IpcService();
 
@@ -30,11 +30,14 @@ export const readCourseCSV = async (path: string): Promise<Course[]> => {
 
 export const readUserCSV = async (path: string): Promise<User[]> => {
 	const { result } = await ipc.send<{ result: User[] }, { path: string }>(
-		ReadCSVChannels.ReadCourse,
+		ReadCSVChannels.ReadUser,
 		{
 			params: { path },
 		}
 	);
-	if (result) return Promise.resolve(result);
+	if (result) {
+		result.map((r) => (r.name = new Name((r as any).first!, (r as any).last!)));
+		return Promise.resolve(result);
+	}
 	return Promise.reject();
 };

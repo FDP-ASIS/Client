@@ -14,6 +14,7 @@ export class Name extends Json {
 	private _first: string;
 	private _last: string;
 
+	constructor(first?: string, last?: string);
 	constructor(first: string, last: string) {
 		super();
 		this.first = first;
@@ -60,8 +61,24 @@ export class User extends Json {
 	private _email: string;
 	private _role: Role;
 
-	constructor(id?: string, name?: Name, username?: string, email?: string, role?: Role);
-	constructor(id: string, name: Name, username: string, email: string, role: Role) {
+	constructor(
+		id?: string,
+		name?: Name,
+		username?: string,
+		email?: string,
+		role?: Role,
+		first?: string,
+		last?: string
+	);
+	constructor(
+		id: string,
+		name: Name,
+		username: string,
+		email: string,
+		role: Role,
+		first?: string,
+		last?: string
+	) {
 		super();
 		this.id = id;
 		this.name = name;

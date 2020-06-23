@@ -28,6 +28,7 @@
 	},
 	"dependencies": {
 		"@blueprintjs/core": "^3.26.1",
+		"@blueprintjs/select": "^3.13.3",
 		"@blueprintjs/table": "^3.8.9",
 		"antd": "^4.2.0",
 		"axios": "^0.19.2",

@@ -1,19 +1,21 @@
 import * as React from 'react';
 import Strings from '../../utils/strings';
 import {
+	H4,
 	H3,
 	H2,
 	Button,
 	Alignment,
 	Intent,
 	InputGroup,
-	NumericInput,
 	Spinner,
 	Alert,
 	Overlay,
 	Classes,
 	Toaster,
+	MenuItem,
 } from '@blueprintjs/core';
+import { Select } from '@blueprintjs/select';
 import styled from 'styled-components';
 import { Table, Empty, Row, Col, Space } from 'antd';
 import classNames from 'classnames';
@@ -42,13 +44,11 @@ export interface State {
 	data: (User & Key)[];
 	addData: (User & Key)[];
 	clicked: boolean;
-	currentPage: number;
-	hasNextPage: boolean;
 	isOpenAlert: boolean;
 	OverlayIsOpen: boolean;
 	currentUserID?: string;
 	currentUser: null | User;
-	addDataRole: Role | null;
+	addDataRole?: Role | null;
 	searchID: string;
 }
 
@@ -60,13 +60,6 @@ const FillAllPage = styled.div`
 	width: 100%;
 	display: flex;
 	flex-direction: column;
-`;
-
-const CenterPage = styled.div`
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
 `;
 
 const Center = styled(H2)`
@@ -86,10 +79,11 @@ const CenterMe = styled.div`
 	transform: translate(-50%, -50%);
 `;
 
+const RoleSelect = Select.ofType<Role>();
+
 export default class UserUI extends React.Component<Props, State> {
 	inputReference: React.RefObject<HTMLInputElement> = React.createRef();
 	userApi: UserApi;
-
 	constructor(props: Props) {
 		super(props);
 		this.userApi = new UserApi();
@@ -97,12 +91,9 @@ export default class UserUI extends React.Component<Props, State> {
 			searchID: '',
 			loading: false,
 			clicked: false,
-			currentPage: 0,
-			hasNextPage: false,
 			isOpenAlert: false,
 			OverlayIsOpen: false,
 			currentUser: null,
-			addDataRole: null,
 			addData: [],
 			data: [],
 		};
@@ -134,24 +125,28 @@ export default class UserUI extends React.Component<Props, State> {
 
 	createAllUsers = () => {
 		if (this.state.addData.length) {
-			this.setState({
-				loading: true,
-			});
-			this.userApi
-				.register(this.state.addData, this.state.addDataRole!)
-				.then(() => {
-					this.closeOverlay();
-					this.addToast(Strings.CREATED, Intent.SUCCESS, 'saved');
-				})
-				.catch((error) => {
-					console.log(error);
-					this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
-				})
-				.finally(() => {
-					this.setState({
-						loading: false,
-					});
+			if (this.state.addDataRole) {
+				this.setState({
+					loading: true,
 				});
+				this.userApi
+					.register(this.state.addData, this.state.addDataRole!)
+					.then(() => {
+						this.closeOverlay();
+						this.addToast(Strings.CREATED, Intent.SUCCESS, 'saved');
+					})
+					.catch((error) => {
+						console.log(error);
+						this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
+					})
+					.finally(() => {
+						this.setState({
+							loading: false,
+						});
+					});
+			} else {
+				this.addToast(Strings.PLEASE_ENTER_ROLE, Intent.DANGER, 'issue');
+			}
 		} else {
 			this.addToast(Strings.ENTER_ONE_ROW, Intent.DANGER, 'issue');
 		}
@@ -233,6 +228,7 @@ export default class UserUI extends React.Component<Props, State> {
 		this.setState({
 			OverlayIsOpen: false,
 			currentUser: null,
+			addDataRole: null,
 			addData: [] as User[],
 		});
 	};
@@ -268,10 +264,10 @@ export default class UserUI extends React.Component<Props, State> {
 					value = user.id;
 					break;
 				case 1:
-					value = user.name.first;
+					value = user.name ? user.name.first : '';
 					break;
 				case 2:
-					value = user.name.last;
+					value = user.name ? user.name.last : '';
 					break;
 				case 3:
 					value = user.username;
@@ -292,7 +288,7 @@ export default class UserUI extends React.Component<Props, State> {
 	};
 
 	addNewRow = () => {
-		this.state.addData.push(new User());
+		this.state.addData.push(new User(undefined, new Name()));
 		this.setState({
 			addData: this.state.addData,
 		});
@@ -302,20 +298,20 @@ export default class UserUI extends React.Component<Props, State> {
 		const {
 			loading,
 			data,
-			currentPage,
-			hasNextPage,
 			isOpenAlert,
 			OverlayIsOpen,
 			currentUser,
 			addData,
 			clicked,
 			searchID,
+			addDataRole,
 		} = this.state;
 
 		data.map((record, index) => (record.key = index));
 
 		const classes = classNames(Classes.CARD, Classes.ELEVATION_4, OVERLAY_CLASS);
 
+		const allRoles = [Role.STUDENT, Role.LECTURER];
 		return (
 			<>
 				<Toaster
@@ -337,7 +333,7 @@ export default class UserUI extends React.Component<Props, State> {
 										<Col span={16}>
 											<InputGroup
 												placeholder={Strings.ENTER_ID}
-												disabled={loading}
+												disabled={true}
 												value={currentUser.id}
 												onChange={(event: any) => {
 													currentUser.id = event.target!.value;
@@ -469,6 +465,48 @@ export default class UserUI extends React.Component<Props, State> {
 										/>
 									</Col>
 								</Row>
+								<Row gutter={[20, 20]}>
+									<Col span={3}>
+										<CenterMe>
+											<H4>{Strings.ROLE}:</H4>
+										</CenterMe>
+									</Col>
+									<Col>
+										<RoleSelect
+											filterable={false}
+											itemRenderer={(item) => (
+												<MenuItem
+													text={item}
+													active={item === addDataRole}
+													onClick={() => {
+														this.setState({ addDataRole: item });
+													}}
+												/>
+											)}
+											items={allRoles}
+											noResults={
+												<MenuItem
+													disabled={true}
+													text={Strings.NO_RESULT_FOUND}
+												/>
+											}
+											onItemSelect={(item) => {
+												this.setState({ addDataRole: item });
+											}}
+										>
+											<Button
+												rightIcon="caret-down"
+												text={
+													addDataRole
+														? addDataRole
+														: `(${Strings.NO_RESULT_FOUND})`
+												}
+												disabled={false}
+											/>
+										</RoleSelect>
+									</Col>
+								</Row>
+
 								<div
 									style={{
 										height: '350px',
@@ -492,11 +530,23 @@ export default class UserUI extends React.Component<Props, State> {
 										}
 									>
 										<AddColumn
-											name={Strings.NAME}
+											name={Strings.ID}
 											cellRenderer={this.cellRenderer}
 										/>
 										<AddColumn
-											name={Strings.ID}
+											name={Strings.FIRST_NAME}
+											cellRenderer={this.cellRenderer}
+										/>
+										<AddColumn
+											name={Strings.LAST_NAME}
+											cellRenderer={this.cellRenderer}
+										/>
+										<AddColumn
+											name={Strings.USERNAME}
+											cellRenderer={this.cellRenderer}
+										/>
+										<AddColumn
+											name={Strings.EMAIL}
 											cellRenderer={this.cellRenderer}
 										/>
 									</AddTable>
@@ -505,7 +555,7 @@ export default class UserUI extends React.Component<Props, State> {
 						)}
 						<div
 							className={Classes.DIALOG_FOOTER_ACTIONS}
-							style={{ marginTop: '20px' }}
+							style={{ marginTop: '10px' }}
 						>
 							<Button
 								intent={Intent.DANGER}
@@ -588,7 +638,7 @@ export default class UserUI extends React.Component<Props, State> {
 								</Row>
 							</div>
 						</Col>
-						<Col span={8}>
+						<Col span={6} offset={2}>
 							<div style={{ marginBottom: '10%' }}>
 								<Button
 									intent={Intent.SUCCESS}

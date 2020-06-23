@@ -80,6 +80,9 @@ const english: Strings = {
 	ENTER_FIRST_NAME: 'Enter first name',
 	ENTER_LAST_NAME: 'Enter last name',
 	ENTER_EMAIL: 'Enter email',
+	ROLE: 'Role',
+	NO_SELECTION: 'No selection',
+	PLEASE_ENTER_ROLE: 'Please enter role',
 };
 
 export default english;
