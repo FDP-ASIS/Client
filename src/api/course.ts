@@ -76,6 +76,10 @@ export class CourseApi extends Api {
 	public assignLecturer<R = Course>(courseCode: number, lecturerId: string): Promise<R> {
 		return this.patch(this.ASSIGN_LECTURER + courseCode + '/' + lecturerId);
 	}
+
+	public removeLecturer(courseCode: number, lecturerId: string) {
+		return this.delete(this.ASSIGN_LECTURER + courseCode + '/' + lecturerId);
+	}
 }
 
 export const courseApi = new CourseApi();

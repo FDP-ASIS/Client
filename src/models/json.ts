@@ -6,7 +6,6 @@ export class Json {
 			.forEach((key) => {
 				json = json.replace(key, key.substring(1));
 			});
-
 		return json;
 	}
 }

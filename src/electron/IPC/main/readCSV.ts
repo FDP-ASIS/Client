@@ -3,7 +3,7 @@ import { AbstractChannel } from './abstractChannel';
 import { IpcRequest } from '../../shared/IpcRequest';
 import { ReadCSVChannels } from '../channels/readCSV';
 
-import { readDepartmentCSV, readCourseCSV } from '../../tools/readCSV';
+import { readDepartmentCSV, readCourseCSV, readUserCSV } from '../../tools/readCSV';
 
 export class ReadDepartmentCSVChannel extends AbstractChannel {
 	getName(): string {
@@ -29,26 +29,14 @@ export class ReadCourseCSVChannel extends AbstractChannel {
 	}
 }
 
-// export class SetAuthTokenChannel extends AbstractChannel {
-// 	getName(): string {
-// 		return AuthChannels.SetAuthToken;
-// 	}
+export class ReadUserCSVChannel extends AbstractChannel {
+	getName(): string {
+		return ReadCSVChannels.ReadUser;
+	}
 
-// 	handleRequest(event: IpcMainEvent, request: IpcRequest<{ token: string }>): void {
-// 		event.sender.send(request.responseChannel!, {
-// 			succeed: setAuthTokenStore(request.params!.token),
-// 		});
-// 	}
-// }
-
-// export class RemoveAuthTokenChannel extends AbstractChannel {
-// 	getName(): string {
-// 		return AuthChannels.RemoveAuthToken;
-// 	}
-
-// 	handleRequest(event: IpcMainEvent, request: IpcRequest<{ token: string }>): void {
-// 		event.sender.send(request.responseChannel!, {
-// 			succeed: removeAuthTokenStore(),
-// 		});
-// 	}
-// }
+	async handleRequest(event: IpcMainEvent, request: IpcRequest<{ path: string }>): Promise<void> {
+		event.sender.send(request.responseChannel!, {
+			result: await readUserCSV(request.params!.path),
+		});
+	}
+}

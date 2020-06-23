@@ -321,7 +321,22 @@ export default class CoursesUI extends React.Component<Props, State> {
 	};
 
 	removeLecturer = (id: string) => {
-		console.log(id);
+		const { currentCourse } = this.state;
+		this.setState({ loading: true });
+
+		this.courseApi.removeLecturer(currentCourse!.code, id).then(() => {
+			this.courseApi
+				.getCourses(0, undefined, currentCourse!.code)
+				.then((res) =>
+					this.setState({
+						addedLecturer: true,
+						currentCourse: res[0],
+					})
+				)
+				.finally(() => {
+					this.setState({ loading: false });
+				});
+		});
 	};
 
 	render() {

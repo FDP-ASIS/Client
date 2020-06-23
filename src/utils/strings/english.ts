@@ -66,6 +66,23 @@ const english: Strings = {
 	ADD: 'Add',
 	ADDED: 'Added',
 	ID: 'ID',
+	EDIT_USER: 'Edit user',
+	ENTER_NAME: 'Enter name',
+	ENTER_ID: 'Enter id',
+	ADD_USER: 'Add user',
+	SEARCH_USER: 'Search user',
+	ENTER_ID_TO_SEARCH: 'Enter id to search',
+	ADD_NEW_USERS: 'Add new users',
+	DELETE_ALL_USERS: 'Delete all users',
+	FIRST_NAME: 'First',
+	LAST_NAME: 'Last',
+	EMAIL: 'Email',
+	ENTER_FIRST_NAME: 'Enter first name',
+	ENTER_LAST_NAME: 'Enter last name',
+	ENTER_EMAIL: 'Enter email',
+	ROLE: 'Role',
+	NO_SELECTION: 'No selection',
+	PLEASE_ENTER_ROLE: 'Please enter role',
 };
 
 export default english;

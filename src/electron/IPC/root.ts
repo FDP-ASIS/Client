@@ -6,7 +6,7 @@ import {
 	RemoveAuthTokenChannel,
 } from './main/authChannel';
 
-import { ReadDepartmentCSVChannel, ReadCourseCSVChannel } from './main/readCSV';
+import { ReadDepartmentCSVChannel, ReadCourseCSVChannel, ReadUserCSVChannel } from './main/readCSV';
 
 interface ClassType<T> {
 	new (...args: any[]): T;
@@ -18,6 +18,7 @@ const ipcsClasses: ClassType<any>[] = [
 	RemoveAuthTokenChannel,
 	ReadDepartmentCSVChannel,
 	ReadCourseCSVChannel,
+	ReadUserCSVChannel,
 ];
 
 const ipcs: IpcChannelInterface<any>[] = ipcsClasses.map((clazz) => new clazz());
