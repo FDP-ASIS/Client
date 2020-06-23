@@ -1,6 +1,6 @@
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Api } from './config/api';
-import { Credentials, User } from '../models/user';
+import { Credentials, User, Role } from '../models/user';
 
 interface UserWithToken {
 	user: User;
@@ -8,11 +8,20 @@ interface UserWithToken {
 }
 
 export class UserApi extends Api {
-	private readonly BASE = 'auth';
+	private readonly BASE = 'user';
+	private readonly BASE_AUTH = 'auth';
+	private readonly ADMIN_BASE = `${this.BASE}/admin`;
 
-	private readonly LOGIN = `${this.BASE}/login`;
-	private readonly LOGOUT = `${this.BASE}/logout`;
-	private readonly AUTH_WITH_TOKEN = this.BASE;
+	private readonly LOGIN = `${this.BASE_AUTH}/login`;
+	private readonly LOGOUT = `${this.BASE_AUTH}/logout`;
+	private readonly AUTH_WITH_TOKEN = this.BASE_AUTH;
+
+	private readonly REGISTER_USERS = `${this.ADMIN_BASE}/register/`; //{role}
+	private readonly GET_USERS = `${this.ADMIN_BASE}`;
+	private readonly GET_USER = `${this.ADMIN_BASE}/`; //{id}
+	private readonly DELETE_USERS = `${this.ADMIN_BASE}`;
+	private readonly DELETE_ONE_USERS = `${this.ADMIN_BASE}/`; //{id}
+	private readonly UPDATE_USER = `${this.ADMIN_BASE}/`; //{id}
 
 	public constructor(config?: AxiosRequestConfig) {
 		super(config);
@@ -29,6 +38,14 @@ export class UserApi extends Api {
 
 		this.login = this.login.bind(this);
 		this.loginWithToken = this.loginWithToken.bind(this);
+		this.logout = this.logout.bind(this);
+		this.register = this.register.bind(this);
+		this.getUsers = this.getUsers.bind(this);
+		this.getUser = this.getUser.bind(this);
+		this.deleteUsers = this.deleteUsers.bind(this);
+		this.deleteUser = this.deleteUser.bind(this);
+		this.updateUser = this.updateUser.bind(this);
+
 		// this.userRegister = this.userRegister.bind(this);
 		// this.getAllUsers = this.getAllUsers.bind(this);
 		// this.getById = this.getById.bind(this);
@@ -44,6 +61,31 @@ export class UserApi extends Api {
 
 	public logout(): Promise<{}> {
 		return this.delete(this.LOGOUT);
+	}
+
+	public register<R = User[]>(users: R, userRole: Role): Promise<R> {
+		return this.post<R, R>(this.REGISTER_USERS + Role[userRole], users);
+	}
+
+	public getUsers<R = User[]>(page: number): Promise<R> {
+		return this.get<R>(this.GET_USERS, { params: { page } });
+	}
+
+	public getUser<R = User>(id: string): Promise<R> {
+		return this.get<R>(this.GET_USER + id);
+	}
+
+	public deleteUsers() {
+		return this.delete(this.DELETE_USERS);
+	}
+
+	public deleteUser(id: string) {
+		return this.delete(this.DELETE_ONE_USERS + id);
+	}
+
+	public updateUser(id: string, user: User) {
+		user.name = JSON.parse(user.name.toJsonString());
+		return this.put(this.UPDATE_USER + id, JSON.parse(user.toJsonString()));
 	}
 
 	// public userRegister(user: User): Promise<number> {

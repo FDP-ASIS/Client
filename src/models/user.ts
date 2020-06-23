@@ -1,3 +1,4 @@
+import { Json } from './json';
 export interface Credentials {
 	username: string;
 	password: string;
@@ -9,14 +10,13 @@ export enum Role {
 	ADMIN = 'ADMIN',
 }
 
-export class Name {
+export class Name extends Json {
 	private _first: string;
-	private _middle: string;
 	private _last: string;
 
-	constructor(first: string, middle: string, last: string) {
+	constructor(first: string, last: string) {
+		super();
 		this.first = first;
-		this.middle = middle;
 		this.last = last;
 	}
 
@@ -26,14 +26,6 @@ export class Name {
 	 */
 	public get first(): string {
 		return this._first;
-	}
-
-	/**
-	 * Getter middle
-	 * @return {string}
-	 */
-	public get middle(): string {
-		return this._middle;
 	}
 
 	/**
@@ -53,14 +45,6 @@ export class Name {
 	}
 
 	/**
-	 * Setter middle
-	 * @param {string} value
-	 */
-	public set middle(value: string) {
-		this._middle = value;
-	}
-
-	/**
 	 * Setter last
 	 * @param {string} value
 	 */
@@ -69,14 +53,16 @@ export class Name {
 	}
 }
 
-export class User {
+export class User extends Json {
 	private _id: string;
 	private _name: Name;
 	private _username: string;
 	private _email: string;
 	private _role: Role;
 
+	constructor(id?: string, name?: Name, username?: string, email?: string, role?: Role);
 	constructor(id: string, name: Name, username: string, email: string, role: Role) {
+		super();
 		this.id = id;
 		this.name = name;
 		this.username = username;

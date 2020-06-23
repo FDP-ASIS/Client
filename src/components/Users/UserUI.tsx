@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Strings from '../../utils/strings';
 import {
-	H4,
 	H3,
 	H2,
 	Button,
@@ -25,12 +24,11 @@ import {
 	TableLoadingOption,
 } from '@blueprintjs/table';
 
-// import { Element } from 'react-scroll';
-import { Course } from '../../models/course';
-import { readCourseCSV } from '../../utils/readCSV';
-import { CourseApi } from '../../api/course';
+import { User, Name, Role } from '../../models/user';
+import { readUserCSV } from '../../utils/readCSV';
+import { UserApi } from '../../api/user';
 import { IconName } from '@blueprintjs/core';
-import { User } from '../../models/user';
+import ColumnGroup from 'antd/lib/table/ColumnGroup';
 
 const { Column } = Table;
 
@@ -41,21 +39,17 @@ export interface Key {
 
 export interface State {
 	loading: boolean;
-	data: (Course & Key)[];
-	addData: (Course & Key)[];
+	data: (User & Key)[];
+	addData: (User & Key)[];
 	clicked: boolean;
 	currentPage: number;
 	hasNextPage: boolean;
 	isOpenAlert: boolean;
-	delete: number | null;
 	OverlayIsOpen: boolean;
-	currentCourseCode?: number;
-	currentCourse: null | Course;
-	searchName?: string | undefined;
-	searchCode?: number | undefined;
-	assignLecturer: boolean;
-	lecturerID?: string | undefined;
-	addedLecturer?: boolean;
+	currentUserID?: string;
+	currentUser: null | User;
+	addDataRole: Role | null;
+	searchID: string;
 }
 
 const OVERLAY_CLASS = 'overlay-transition';
@@ -85,23 +79,30 @@ const Center = styled(H2)`
 	text-align: center;
 `;
 
-export default class CoursesUI extends React.Component<Props, State> {
+const CenterMe = styled.div`
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+`;
+
+export default class UserUI extends React.Component<Props, State> {
 	inputReference: React.RefObject<HTMLInputElement> = React.createRef();
-	courseApi: CourseApi;
+	userApi: UserApi;
 
 	constructor(props: Props) {
 		super(props);
-		this.courseApi = new CourseApi();
+		this.userApi = new UserApi();
 		this.state = {
+			searchID: '',
 			loading: false,
 			clicked: false,
 			currentPage: 0,
 			hasNextPage: false,
 			isOpenAlert: false,
-			delete: null,
 			OverlayIsOpen: false,
-			currentCourse: null,
-			assignLecturer: false,
+			currentUser: null,
+			addDataRole: null,
 			addData: [],
 			data: [],
 		};
@@ -113,7 +114,7 @@ export default class CoursesUI extends React.Component<Props, State> {
 			this.setState({
 				loading: true,
 			});
-			readCourseCSV(this.inputReference.current.files[0].path)
+			readUserCSV(this.inputReference.current.files[0].path)
 				.then((res) => {
 					this.setState({ addData: res });
 				})
@@ -131,16 +132,16 @@ export default class CoursesUI extends React.Component<Props, State> {
 		if (this.toaster) this.toaster.show({ message: reason, intent: color, icon: icon });
 	};
 
-	createAllCourses = () => {
+	createAllUsers = () => {
 		if (this.state.addData.length) {
 			this.setState({
 				loading: true,
 			});
-			this.courseApi
-				.create(this.state.addData)
+			this.userApi
+				.register(this.state.addData, this.state.addDataRole!)
 				.then(() => {
 					this.closeOverlay();
-					this.addToast(Strings.CREATED, Intent.SUCCESS, 'thumbs-up');
+					this.addToast(Strings.CREATED, Intent.SUCCESS, 'saved');
 				})
 				.catch((error) => {
 					console.log(error);
@@ -156,22 +157,14 @@ export default class CoursesUI extends React.Component<Props, State> {
 		}
 	};
 
-	search = (currentPage?: number) => {
-		if (!currentPage) currentPage = this.state.currentPage;
-
-		const { searchName, searchCode } = this.state;
+	search = () => {
+		const { searchID } = this.state;
 		this.setState({ loading: true, clicked: true });
-		this.courseApi
-			.getCourses(currentPage, searchName, searchCode)
+		this.userApi
+			.getUser(searchID!)
 			.then((result) => {
-				this.setState({ data: result });
+				this.setState({ data: [result] });
 			})
-			.then(() => this.courseApi.getCourses(currentPage! + 1, searchName, searchCode))
-			.then((res) =>
-				this.setState({
-					hasNextPage: res.length > 0 && searchName !== undefined ? true : false,
-				})
-			)
 			.finally(() => this.setState({ loading: false }));
 	};
 
@@ -179,30 +172,37 @@ export default class CoursesUI extends React.Component<Props, State> {
 		this.setState({ data: [], clicked: false });
 	};
 
-	delete = (id: number | null = null) => {
+	delete = (id: string | undefined = undefined) => {
 		this.setState({
 			isOpenAlert: true,
-			delete: id,
+			currentUserID: id,
 		});
 	};
 
-	edit = (course: Course) => {
+	edit = (user: User) => {
 		this.setState({
 			OverlayIsOpen: true,
-			currentCourse: new Course(course.name, course.code),
-			currentCourseCode: course.code,
+			currentUser: new User(
+				user.id,
+				new Name(user.name.first, user.name.last),
+				user.username,
+				user.email,
+				user.role
+			),
+			currentUserID: user.id,
 		});
 	};
 
-	editCourse = () => {
+	editUser = () => {
 		this.setState({
 			loading: true,
 		});
-		this.courseApi
-			.editCourse(this.state.currentCourseCode!, this.state.currentCourse!)
+		console.log(this.state.currentUser, this.state.currentUserID);
+		this.userApi
+			.updateUser(this.state.currentUserID!, this.state.currentUser!)
 			.then(() => {
-				this.closeOverlay();
 				this.search();
+				this.closeOverlay();
 				this.addToast(Strings.CREATED, Intent.SUCCESS, 'saved');
 			})
 			.catch((error) => {
@@ -217,35 +217,43 @@ export default class CoursesUI extends React.Component<Props, State> {
 	};
 
 	deleteConfirm = () => {
-		let deleteId = this.state.delete!;
-		if (deleteId) this.courseApi.deleteOne(deleteId);
-		else this.courseApi.deleteAll();
+		let deleteId = this.state.currentUserID!;
+		if (deleteId) this.userApi.deleteUser(deleteId);
+		else this.userApi.deleteUsers();
 		this.setState({
 			isOpenAlert: false,
-			delete: null,
+			currentUserID: undefined,
+			data: [],
+			clicked: false,
+			searchID: '',
 		});
-		this.search();
 	};
 
 	closeOverlay = () => {
-		if (this.state.addedLecturer) this.search();
 		this.setState({
 			OverlayIsOpen: false,
-			currentCourse: null,
-			addData: [] as Course[],
-			assignLecturer: false,
-			addedLecturer: false,
+			currentUser: null,
+			addData: [] as User[],
 		});
 	};
 
 	changeAddRow = (value: string, rowIndex: number, columnIndex: number) => {
-		let course = this.state.addData[rowIndex!];
+		let user = this.state.addData[rowIndex!];
 		switch (columnIndex) {
 			case 0:
-				course.name = value;
+				user.id = value;
 				break;
 			case 1:
-				course.code = +value;
+				user.name.first = value;
+				break;
+			case 2:
+				user.name.last = value;
+				break;
+			case 3:
+				user.username = value;
+				break;
+			case 4:
+				user.email = value;
 				break;
 		}
 		// this.forceUpdate();
@@ -254,13 +262,22 @@ export default class CoursesUI extends React.Component<Props, State> {
 	cellRenderer = (rowIndex: number, columnIndex: number) => {
 		if (this.state.addData.length) {
 			let value: string | number | undefined;
-			let course = this.state.addData[rowIndex];
+			let user = this.state.addData[rowIndex];
 			switch (columnIndex) {
 				case 0:
-					value = course.name;
+					value = user.id;
 					break;
 				case 1:
-					value = course.code;
+					value = user.name.first;
+					break;
+				case 2:
+					value = user.name.last;
+					break;
+				case 3:
+					value = user.username;
+					break;
+				case 4:
+					value = user.email;
 					break;
 			}
 			return (
@@ -275,67 +292,9 @@ export default class CoursesUI extends React.Component<Props, State> {
 	};
 
 	addNewRow = () => {
-		this.state.addData.push(new Course());
+		this.state.addData.push(new User());
 		this.setState({
 			addData: this.state.addData,
-		});
-		this.search();
-	};
-
-	assignLecturer = (course: Course) => {
-		this.setState({
-			OverlayIsOpen: true,
-			currentCourse: course,
-			assignLecturer: true,
-		});
-	};
-
-	assignLecturerConfirm = () => {
-		const { currentCourse, lecturerID } = this.state;
-		this.setState({ loading: true });
-		this.courseApi
-			.assignLecturer(currentCourse!.code, lecturerID!)
-			.then((res) => {
-				this.courseApi
-					.getCourses(0, undefined, currentCourse!.code)
-					.then((res) => {
-						this.setState({
-							addedLecturer: true,
-							currentCourse: res[0],
-							lecturerID: '',
-						});
-						this.addToast(Strings.ADDED, Intent.SUCCESS, 'thumbs-up');
-					})
-					.catch((error) => {
-						console.log(error);
-						this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
-					});
-			})
-			.catch((error) => {
-				console.log(error);
-				this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
-			})
-			.finally(() => {
-				this.setState({ loading: false });
-			});
-	};
-
-	removeLecturer = (id: string) => {
-		const { currentCourse } = this.state;
-		this.setState({ loading: true });
-
-		this.courseApi.removeLecturer(currentCourse!.code, id).then(() => {
-			this.courseApi
-				.getCourses(0, undefined, currentCourse!.code)
-				.then((res) =>
-					this.setState({
-						addedLecturer: true,
-						currentCourse: res[0],
-					})
-				)
-				.finally(() => {
-					this.setState({ loading: false });
-				});
 		});
 	};
 
@@ -347,16 +306,13 @@ export default class CoursesUI extends React.Component<Props, State> {
 			hasNextPage,
 			isOpenAlert,
 			OverlayIsOpen,
-			currentCourse,
+			currentUser,
 			addData,
 			clicked,
-			searchName,
-			searchCode,
-			assignLecturer,
-			lecturerID,
+			searchID,
 		} = this.state;
 
-		data.map((record) => (record.key = record.code));
+		data.map((record, index) => (record.key = index));
 
 		const classes = classNames(Classes.CARD, Classes.ELEVATION_4, OVERLAY_CLASS);
 
@@ -370,119 +326,118 @@ export default class CoursesUI extends React.Component<Props, State> {
 				/>
 				<Overlay isOpen={OverlayIsOpen} usePortal>
 					<div className={classes} style={{ color: 'black' }}>
-						{currentCourse ? (
-							assignLecturer ? (
+						{currentUser ? (
+							<>
+								<H3 style={{ marginBottom: '20px' }}>{Strings.EDIT_USER}</H3>
 								<>
-									<H3 style={{ marginBottom: '20px' }}>
-										{Strings.ASSIGN_LECTURER}
-									</H3>
-									<Row gutter={[20, 6]}>
-										<Col span={2}>{Strings.NAME}:</Col>
-										<Col span={8}>{currentCourse.name}</Col>
-									</Row>
 									<Row gutter={[20, 16]}>
-										<Col span={2}>{Strings.CODE}:</Col>
-										<Col span={8}>{currentCourse.code}</Col>
-									</Row>
-									<Row gutter={[20, 16]}>
-										<Col span={8}>
-											<H4>{Strings.ADD_LECTURER_BY_ID}: </H4>
+										<Col span={3}>
+											<CenterMe>{Strings.ID}:</CenterMe>
 										</Col>
-										<Col span={8}>
+										<Col span={16}>
 											<InputGroup
-												placeholder={Strings.LECTURER_ID}
+												placeholder={Strings.ENTER_ID}
 												disabled={loading}
-												value={lecturerID}
+												value={currentUser.id}
 												onChange={(event: any) => {
+													currentUser.id = event.target!.value;
 													this.setState({
-														lecturerID: event.target!.value,
+														currentUser: currentUser,
 													});
 												}}
 											/>
 										</Col>
-										<Col offset={1}>
-											<Button
-												intent={Intent.PRIMARY}
-												disabled={loading}
-												onClick={() => this.assignLecturerConfirm()}
-												text={Strings.ADD}
-											/>
+									</Row>
+									<Row gutter={[20, 16]}>
+										<Col span={3}>
+											<CenterMe>{Strings.NAME}:</CenterMe>
+										</Col>
+										<Col span={16}>
+											<Row gutter={[20, 16]}>
+												<Col span={3}>
+													<CenterMe>{Strings.FIRST_NAME}:</CenterMe>
+												</Col>
+												<Col>
+													<InputGroup
+														placeholder={Strings.ENTER_FIRST_NAME}
+														disabled={loading}
+														fill={true}
+														value={currentUser.name.first}
+														onChange={(event: any) => {
+															currentUser.name.first = event.target!.value;
+															this.setState({
+																currentUser: currentUser,
+															});
+														}}
+													/>
+												</Col>
+											</Row>
+											<Row gutter={[20, 16]}>
+												<Col span={3}>
+													<CenterMe>{Strings.LAST_NAME}:</CenterMe>
+												</Col>
+												<Col>
+													<InputGroup
+														placeholder={Strings.ENTER_LAST_NAME}
+														disabled={loading}
+														fill={true}
+														value={currentUser.name.last}
+														onChange={(event: any) => {
+															currentUser.name.last = event.target!.value;
+															this.setState({
+																currentUser: currentUser,
+															});
+														}}
+													/>
+												</Col>
+											</Row>
 										</Col>
 									</Row>
-									<Table
-										bordered
-										size="small"
-										dataSource={currentCourse.lecturers}
-										scroll={{ x: true, y: 320 }}
-										style={{ marginBottom: 20 }}
-									>
-										<Column title={Strings.ID} dataIndex="id" key="id" />
-										<Column
-											title={Strings.USERNAME}
-											dataIndex="username"
-											key="username"
-										/>
-										<Column
-											align="center"
-											title={Strings.ACTIONS}
-											key="action"
-											render={(text, record: User) => (
-												<Button
-													text={Strings.DELETE}
-													intent={Intent.DANGER}
-													onClick={() => this.removeLecturer(record.id)}
-												/>
-											)}
-										/>
-									</Table>
-								</>
-							) : (
-								<>
-									<H3 style={{ marginBottom: '20px' }}>{Strings.EDIT_COURSE}</H3>
-									<Row gutter={[20, 16]}>
-										<Col span={3}>{Strings.NAME}:</Col>
+									<Row gutter={[6, 24]}>
+										<Col span={3}>
+											<CenterMe>{Strings.USERNAME}:</CenterMe>
+										</Col>
 										<Col span={16}>
 											<InputGroup
-												placeholder={Strings.ENTER_NAME_TO_SEARCH}
+												placeholder={Strings.ENTER_USERNAME}
 												disabled={loading}
-												value={currentCourse.name}
+												fill={true}
+												value={currentUser.username}
 												onChange={(event: any) => {
-													currentCourse.name = event.target!.value;
+													currentUser.username = event.target!.value;
 													this.setState({
-														currentCourse: currentCourse,
+														currentUser: currentUser,
 													});
 												}}
 											/>
 										</Col>
 									</Row>
 									<Row gutter={[6, 24]}>
-										<Col span={3}>{Strings.CODE}:</Col>
+										<Col span={3}>
+											<CenterMe>{Strings.EMAIL}:</CenterMe>
+										</Col>
 										<Col span={16}>
-											<NumericInput
-												allowNumericCharactersOnly={true}
-												fill={true}
-												placeholder={Strings.ENTER_CODE_TO_SEARCH}
+											<InputGroup
+												placeholder={Strings.ENTER_EMAIL}
 												disabled={loading}
-												min={0}
-												value={currentCourse.code}
-												onValueChange={(value) => {
-													currentCourse.code = value;
+												fill={true}
+												value={currentUser.email}
+												onChange={(event: any) => {
+													currentUser.email = event.target!.value;
 													this.setState({
-														currentCourse: currentCourse,
+														currentUser: currentUser,
 													});
 												}}
 											/>
 										</Col>
 									</Row>
 								</>
-							)
+							</>
 						) : (
 							<>
 								<Row>
 									<Col span={10}>
-										<H3 style={{ marginBottom: '20px' }}>
-											{Strings.ADD_COURSE}
-										</H3>
+										<H3 style={{ marginBottom: '20px' }}>{Strings.ADD_USER}</H3>
 									</Col>
 									<Col span={6} offset={8} style={{ marginBottom: '5%' }}>
 										<div style={{ marginBottom: '10%' }}>
@@ -541,7 +496,7 @@ export default class CoursesUI extends React.Component<Props, State> {
 											cellRenderer={this.cellRenderer}
 										/>
 										<AddColumn
-											name={Strings.CODE}
+											name={Strings.ID}
 											cellRenderer={this.cellRenderer}
 										/>
 									</AddTable>
@@ -557,19 +512,19 @@ export default class CoursesUI extends React.Component<Props, State> {
 								disabled={loading}
 								onClick={() => this.closeOverlay()}
 								style={{ margin: '' }}
-								text={Strings.CLOSE}
-							/>
-							{assignLecturer ? null : (
-								<Button
-									disabled={loading}
-									intent={Intent.PRIMARY}
-									style={{ margin: '' }}
-									text={Strings.SAVE}
-									onClick={() =>
-										currentCourse ? this.editCourse() : this.createAllCourses()
-									}
-								/>
-							)}
+							>
+								{Strings.CLOSE}
+							</Button>
+							<Button
+								disabled={loading}
+								intent={Intent.PRIMARY}
+								style={{ margin: '' }}
+								onClick={() =>
+									currentUser ? this.editUser() : this.createAllUsers()
+								}
+							>
+								{Strings.SAVE}
+							</Button>
 						</div>
 					</div>
 				</Overlay>
@@ -596,50 +551,30 @@ export default class CoursesUI extends React.Component<Props, State> {
 				<FillAllPage>
 					<Row gutter={[6, 6]}>
 						<Col span={16}>
-							<H3>{Strings.SEARCH_COURSE}</H3>
+							<H3>{Strings.SEARCH_USER}</H3>
 							<div style={{ marginTop: '5%' }}>
-								<Row gutter={[20, 16]}>
-									<Col span={3}>{Strings.NAME}:</Col>
+								<Row gutter={[20, 20]}>
+									<Col span={2}>{Strings.ID}:</Col>
 									<Col span={16}>
 										<InputGroup
-											placeholder={Strings.ENTER_NAME_TO_SEARCH}
+											placeholder={Strings.ENTER_ID_TO_SEARCH}
 											disabled={loading}
-											value={searchName ? searchName : ''}
+											value={searchID}
 											onChange={(event: any) => {
 												this.setState({
-													searchName: event.target!.value,
-													searchCode: undefined,
-												});
-											}}
-										/>
-									</Col>
-								</Row>
-								<Row gutter={[6, 24]}>
-									<Col span={3}>{Strings.CODE}:</Col>
-									<Col span={16}>
-										<NumericInput
-											allowNumericCharactersOnly={true}
-											fill={true}
-											placeholder={Strings.ENTER_CODE_TO_SEARCH}
-											disabled={loading}
-											min={0}
-											value={searchCode}
-											onValueChange={(val) => {
-												this.setState({
-													searchCode: val,
-													searchName: undefined,
+													searchID: event.target!.value,
 												});
 											}}
 										/>
 									</Col>
 								</Row>
 								<Row gutter={[6, 20]}>
-									<Col span={2} offset={6}>
+									<Col span={2} offset={5}>
 										<Button
 											text={Strings.SEARCH}
 											disabled={loading}
 											intent={Intent.PRIMARY}
-											onClick={() => this.search()}
+											onClick={this.search}
 										/>
 									</Col>
 									<Col span={2} offset={3}>
@@ -653,7 +588,7 @@ export default class CoursesUI extends React.Component<Props, State> {
 								</Row>
 							</div>
 						</Col>
-						<Col span={7} offset={1}>
+						<Col span={8}>
 							<div style={{ marginBottom: '10%' }}>
 								<Button
 									intent={Intent.SUCCESS}
@@ -661,7 +596,7 @@ export default class CoursesUI extends React.Component<Props, State> {
 									rightIcon={'add'}
 									fill={true}
 									disabled={loading}
-									text={Strings.ADD_NEW_COURSE}
+									text={Strings.ADD_NEW_USERS}
 									onClick={() =>
 										this.setState({
 											OverlayIsOpen: true,
@@ -675,7 +610,7 @@ export default class CoursesUI extends React.Component<Props, State> {
 								alignText={Alignment.LEFT}
 								fill={true}
 								disabled={loading}
-								text={Strings.DELETE_ALL_COURSE}
+								text={Strings.DELETE_ALL_USERS}
 								onClick={() =>
 									this.setState({
 										isOpenAlert: true,
@@ -696,14 +631,6 @@ export default class CoursesUI extends React.Component<Props, State> {
 							</Center>
 						) : null
 					) : (
-						// <Element
-						// 	name="search"
-						// 	style={{
-						// 		flexGrow: 1,
-						// 		height: '1px',
-						// 		// overflow: 'scroll',
-						// 	}}
-						// >
 						<>
 							<Table
 								bordered
@@ -713,19 +640,41 @@ export default class CoursesUI extends React.Component<Props, State> {
 								pagination={false}
 								style={{ marginBottom: 20 }}
 							>
-								<Column title={Strings.NAME} dataIndex="name" key="name" />
-								<Column title={Strings.CODE} dataIndex="code" key="code" />
+								<Column title={Strings.ID} dataIndex="id" key="id" align="center" />
+								<ColumnGroup title={Strings.NAME}>
+									<Column
+										title={Strings.FIRST_NAME}
+										dataIndex="name.first"
+										key="name.first"
+										align="center"
+										render={(text, record: User) => record.name.first}
+									/>
+									<Column
+										title={Strings.LAST_NAME}
+										dataIndex="name.last"
+										key="name.last"
+										align="center"
+										render={(text, record: User) => record.name.last}
+									/>
+								</ColumnGroup>
+								<Column
+									title={Strings.USERNAME}
+									dataIndex="username"
+									key="username"
+									align="center"
+								/>
+								<Column
+									title={Strings.EMAIL}
+									dataIndex="email"
+									key="email"
+									align="center"
+								/>
 								<Column
 									align="center"
 									title={Strings.ACTIONS}
 									key="action"
-									render={(text, record: Course) => (
+									render={(text, record: User) => (
 										<Space size="middle">
-											<Button
-												text={Strings.ASSIGN_LECTURER}
-												intent={Intent.PRIMARY}
-												onClick={() => this.assignLecturer(record)}
-											/>
 											<Button
 												text={Strings.EDIT}
 												intent={Intent.WARNING}
@@ -734,43 +683,13 @@ export default class CoursesUI extends React.Component<Props, State> {
 											<Button
 												text={Strings.DELETE}
 												intent={Intent.DANGER}
-												onClick={() => this.delete(record.code)}
+												onClick={() => this.delete(record.id)}
 											/>
 										</Space>
 									)}
 								/>
 							</Table>
-							<Row gutter={[6, 6]} justify="end">
-								<Col>
-									<Button
-										text={`< ${Strings.PREV}`}
-										disabled={currentPage === 0}
-										onClick={() => {
-											this.setState({
-												currentPage: this.state.currentPage - 1,
-											});
-											this.search(this.state.currentPage - 1);
-										}}
-									/>
-								</Col>
-								<Col>
-									<CenterPage>{currentPage + 1}</CenterPage>
-								</Col>
-								<Col>
-									<Button
-										text={`${Strings.NEXT} >`}
-										disabled={!hasNextPage}
-										onClick={() => {
-											this.setState({
-												currentPage: this.state.currentPage + 1,
-											});
-											this.search(this.state.currentPage + 1);
-										}}
-									/>
-								</Col>
-							</Row>
 						</>
-						// </Element>
 					)}
 				</FillAllPage>
 			</>

@@ -66,6 +66,20 @@ export interface Strings {
 	ADD: string;
 	ADDED: string;
 	ID: string;
+	EDIT_USER: string;
+	ENTER_NAME: string;
+	ENTER_ID: string;
+	ADD_USER: string;
+	SEARCH_USER: string;
+	ENTER_ID_TO_SEARCH: string;
+	ADD_NEW_USERS: string;
+	DELETE_ALL_USERS: string;
+	FIRST_NAME: string;
+	LAST_NAME: string;
+	EMAIL: string;
+	ENTER_FIRST_NAME: string;
+	ENTER_LAST_NAME: string;
+	ENTER_EMAIL: string;
 }
 
 enum Languages {

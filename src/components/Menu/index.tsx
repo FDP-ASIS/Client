@@ -39,7 +39,7 @@ export const Menu: FunctionComponent<MenuProps> = (props) => {
 	const location = useLocation().pathname;
 	const history = useHistory();
 	const helloTo = (name: Name | undefined): string => {
-		if (name) return name.first + `${name.middle ? ' ' + name.middle : ''} ` + name.last;
+		if (name) return name.first + ' ' + name.last;
 		return '';
 	};
 	useEffect(() => {
