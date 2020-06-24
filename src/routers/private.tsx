@@ -6,7 +6,7 @@ import { selectUser } from '../redux/reducers/user';
 import { Role } from '../models/user';
 
 export type PrivateRouteProps = {
-	component: React.ComponentType;
+	component: React.ComponentType | React.FunctionComponent;
 	onlyRole?: Role[];
 };
 
