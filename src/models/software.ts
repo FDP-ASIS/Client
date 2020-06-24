@@ -4,6 +4,7 @@ export class Software extends Json {
 	private _name: string;
 	private _version: string;
 
+	constructor(name?: string, version?: string);
 	constructor(name: string, version: string) {
 		super();
 		this.name = name;

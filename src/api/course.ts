@@ -5,6 +5,7 @@ import { Course } from '../models/course';
 export class CourseApi extends Api {
 	private readonly BASE = '/course';
 	private readonly ADMIN_BASE = `${this.BASE}/admin`;
+	private readonly LECTURER_BASE = `${this.BASE}/lecturer`;
 
 	private readonly CREATE = this.ADMIN_BASE;
 	private readonly GET_COURSES = this.ADMIN_BASE;
@@ -12,6 +13,8 @@ export class CourseApi extends Api {
 	private readonly DELETE_COURSE = `${this.ADMIN_BASE}/`; //{code}
 	private readonly DELETE_ALL_COURSES = this.ADMIN_BASE;
 	private readonly ASSIGN_LECTURER = `${this.ADMIN_BASE}/`; //{code}
+
+	private readonly LECTURER_COURSES = `${this.LECTURER_BASE}/`; //{id}
 
 	public constructor(config?: AxiosRequestConfig) {
 		super(config);
@@ -79,6 +82,12 @@ export class CourseApi extends Api {
 
 	public removeLecturer(courseCode: number, lecturerId: string) {
 		return this.delete(this.ASSIGN_LECTURER + courseCode + '/' + lecturerId);
+	}
+
+	public lecturerCourse<R = Course[]>(lecturerId: string): Promise<R | any[]> {
+		return this.get<[]>(this.LECTURER_COURSES + lecturerId).then((obj) =>
+			Object.keys(obj).flatMap((k) => obj[+k])
+		);
 	}
 }
 

@@ -83,6 +83,11 @@ const english: Strings = {
 	ROLE: 'Role',
 	NO_SELECTION: 'No selection',
 	PLEASE_ENTER_ROLE: 'Please enter role',
+	NO_COURSE_FOUND: 'No course found',
+	ADD_OR_REMOVE_SOFTWARE: 'Add/Remove software',
+	SOFTWARE: 'Software',
+	ADD_NEW_SOFTWARE: 'Add new software',
+	VERSION: 'Version',
 };
 
 export default english;
