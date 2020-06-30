@@ -1,15 +1,26 @@
 import * as React from 'react';
+import { Table, Col, Row } from 'antd';
+import {
+	H3,
+	H5,
+	Button,
+	Intent,
+	Overlay,
+	Classes,
+	Toaster,
+	IconName,
+	MenuItem,
+} from '@blueprintjs/core';
+import classNames from 'classnames';
+import styled from 'styled-components';
 import { User } from '../../models/user';
 import { Course } from '../../models/course';
 import { courseApi } from '../../api/course';
-import styled from 'styled-components';
 import Strings from '../../utils/strings';
-import { H3, H5, Button, Intent, Overlay, Classes } from '@blueprintjs/core';
-import { Table, Col, Row } from 'antd';
-import Column from 'antd/lib/table/Column';
-import classNames from 'classnames';
 import { Software } from '../../models/software';
-
+import { Select } from '@blueprintjs/select';
+import { softwareApi } from '../../api/software';
+const { Column } = Table;
 export interface Props {
 	user: User;
 }
@@ -23,6 +34,8 @@ export interface State {
 	currentCourse?: Course;
 	overlayIsOpen: boolean;
 	addSoftware: Software[];
+	softwareNames: string[];
+	version: Map<string, Software[]>;
 }
 
 const CenterPage = styled.div`
@@ -31,6 +44,9 @@ const CenterPage = styled.div`
 	left: 50%;
 	transform: translate(-50%, -50%);
 `;
+
+const SoftwareSelect = Select.ofType<string>();
+
 export default class MyCoursesLecturer extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
@@ -41,6 +57,8 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 			user: props.user,
 			overlayIsOpen: false,
 			addSoftware: [],
+			softwareNames: [],
+			version: new Map<string, Software[]>(),
 		};
 	}
 	componentDidMount() {
@@ -53,7 +71,26 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 				loading: false,
 			});
 		});
+		this.getAllSoftwareName();
 	}
+
+	getAllSoftwareName = () => {
+		softwareApi.getSoftwareName().then((softwareNamesToAdd) => {
+			if (softwareNamesToAdd.length !== 0) {
+				const { softwareNames } = this.state;
+				softwareNames.push(...softwareNamesToAdd);
+				this.setState({
+					softwareNames: softwareNames,
+				});
+			}
+		});
+	};
+
+	private toaster: Toaster | undefined;
+
+	private addToast = (reason: string, color: Intent, icon: IconName) => {
+		if (this.toaster) this.toaster.show({ message: reason, intent: color, icon: icon });
+	};
 
 	softwareOptions = (course: Course) => {
 		const addSoftware: Software[] = this.state.addSoftware;
@@ -80,20 +117,86 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 		});
 	};
 
-	save = () => {};
+	save = (software: Software) => {
+		if (!software.name || !software.version) {
+			this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
+			return;
+		}
+		console.log(software);
+	};
+
 	removeSoftware = (software: Software) => {
 		const { addSoftware } = this.state;
 		addSoftware.pop();
+		this.setState({
+			addSoftware,
+		});
+	};
+
+	selectSoftware = (index: number, softwareName: string) => {
+		const { version, addSoftware } = this.state;
+		if (!version.get(softwareName)) {
+			this.setState(
+				{
+					loading: true,
+				},
+				() => {
+					softwareApi
+						.getSoftwareVersion(softwareName)
+						.then((softwareWithVersions) => {
+							const { version } = this.state;
+							version.set(softwareName, softwareWithVersions);
+							this.setState({
+								version,
+							});
+						})
+						.finally(() => {
+							this.setState({
+								loading: false,
+							});
+						});
+				}
+			);
+		}
+		const currentSoftware = addSoftware.find((_, i) => i === index);
+		if (currentSoftware!.name !== softwareName) {
+			currentSoftware!.version = '';
+			currentSoftware!.name = softwareName;
+		}
+		this.forceUpdate();
+	};
+
+	getVersions = (index: number): string[] | undefined => {
+		const name = this.state.addSoftware.find((_, i) => i === index)?.name;
+		return this.state.version.get(name!)?.map((s) => s.version);
+	};
+
+	selectSoftwareVersion = (index: number, softwareVersion: string) => {
+		const currentSoftware = this.state.addSoftware.find((_, i) => i === index);
+		currentSoftware!.version = softwareVersion;
 	};
 
 	render() {
-		const { courses, overlayIsOpen, currentCourse, loading, addSoftware } = this.state;
+		const {
+			courses,
+			overlayIsOpen,
+			currentCourse,
+			loading,
+			addSoftware,
+			softwareNames,
+		} = this.state;
 		const classes = classNames(Classes.CARD, Classes.ELEVATION_4, OVERLAY_CLASS);
 		courses.map((course, i) => ((course as any)['key'] = i));
 		addSoftware.map((software, i) => ((software as any)['key'] = i));
 		const addSoftwareBind = [...addSoftware];
 		return (
 			<>
+				<Toaster
+					position="top"
+					canEscapeKeyClear={true}
+					maxToasts={1}
+					ref={(ref: Toaster) => (this.toaster = ref)}
+				/>
 				{courses.length === 0 ? (
 					<CenterPage>
 						<H3>{Strings.NO_COURSE_FOUND}</H3>
@@ -150,7 +253,59 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 										render={(value: any, record: Software, index: number) => {
 											if (index < currentCourse!.software.length)
 												return record.name;
-											return 'aaaaaaa';
+											const currentSoftware = addSoftwareBind.find(
+												(_, i) => i === index
+											);
+											console.log(currentSoftware);
+											return (
+												<SoftwareSelect
+													filterable={false}
+													items={softwareNames}
+													itemRenderer={(item, softwareNameIndex) => {
+														return (
+															<MenuItem
+																text={item}
+																active={
+																	currentSoftware
+																		? item ===
+																		  currentSoftware.name
+																		: false
+																}
+																onClick={() => {
+																	this.selectSoftware(
+																		index,
+																		softwareNames.find(
+																			(_, i) =>
+																				i ===
+																				softwareNameIndex.index
+																		)!
+																	);
+																}}
+															/>
+														);
+													}}
+													noResults={
+														<MenuItem
+															disabled={true}
+															text={Strings.NO_RESULT_FOUND}
+														/>
+													}
+													onItemSelect={(item) => {
+														console.log(item);
+														// this.setState({ addDataRole: item });
+													}}
+												>
+													<Button
+														rightIcon="caret-down"
+														text={
+															currentSoftware?.name
+																? currentSoftware.name
+																: Strings.SELECT
+														}
+														disabled={loading}
+													/>
+												</SoftwareSelect>
+											);
 										}}
 									/>
 									<Column
@@ -168,13 +323,25 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 										align="center"
 										title={Strings.ACTIONS}
 										key="action"
-										render={(text, record: Software) => (
-											<Button
-												text={Strings.DELETE}
-												intent={Intent.DANGER}
-												onClick={() => this.removeSoftware(record)}
-											/>
-										)}
+										render={(text, record: Software, index: number) => {
+											if (index < currentCourse!.software.length)
+												return (
+													<Button
+														text={Strings.DELETE}
+														intent={Intent.DANGER}
+														onClick={() => this.removeSoftware(record)}
+													/>
+												);
+											else
+												return (
+													<Button
+														text={Strings.ADD}
+														disabled={loading}
+														intent={Intent.PRIMARY}
+														onClick={() => this.save(record)}
+													/>
+												);
+										}}
 									/>
 								</Table>
 								<div
@@ -186,12 +353,6 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 										disabled={loading}
 										onClick={this.closeOverlay}
 										text={Strings.CLOSE}
-									/>
-									<Button
-										disabled={loading}
-										intent={Intent.PRIMARY}
-										text={Strings.SAVE}
-										onClick={this.save}
 									/>
 								</div>
 							</div>
@@ -224,6 +385,7 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 								render={(text, record: Course) => (
 									<Button
 										text={Strings.ADD_OR_REMOVE_SOFTWARE}
+										disabled={loading}
 										intent={Intent.PRIMARY}
 										onClick={() => this.softwareOptions(record)}
 									/>

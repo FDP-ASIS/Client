@@ -88,6 +88,7 @@ const english: Strings = {
 	SOFTWARE: 'Software',
 	ADD_NEW_SOFTWARE: 'Add new software',
 	VERSION: 'Version',
+	SELECT: 'Select',
 };
 
 export default english;

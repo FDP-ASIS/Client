@@ -1,14 +1,24 @@
 import { Json } from './json';
 
 export class Software extends Json {
+	private _id: string;
 	private _name: string;
 	private _version: string;
 
-	constructor(name?: string, version?: string);
-	constructor(name: string, version: string) {
+	constructor(id?: string, name?: string, version?: string);
+	constructor(id: string, name: string, version: string) {
 		super();
-		this.name = name;
-		this.version = version;
+		this._id = id;
+		this._name = name;
+		this._version = version;
+	}
+
+	/**
+	 * Getter id
+	 * @return {string}
+	 */
+	public get id(): string {
+		return this._id;
 	}
 
 	/**
@@ -25,6 +35,14 @@ export class Software extends Json {
 	 */
 	public get version(): string {
 		return this._version;
+	}
+
+	/**
+	 * Setter id
+	 * @param {string} value
+	 */
+	public set id(value: string) {
+		this._id = value;
 	}
 
 	/**
