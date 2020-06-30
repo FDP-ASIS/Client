@@ -89,6 +89,7 @@ export interface Strings {
 	ADD_NEW_SOFTWARE: string;
 	VERSION: string;
 	SELECT: string;
+	SELECT_SOFTWARE_FIRST: string;
 }
 
 enum Languages {

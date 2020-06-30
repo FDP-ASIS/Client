@@ -122,7 +122,6 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 			this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
 			return;
 		}
-		console.log(software);
 	};
 
 	removeSoftware = (software: Software) => {
@@ -135,28 +134,28 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 
 	selectSoftware = (index: number, softwareName: string) => {
 		const { version, addSoftware } = this.state;
-		if (!version.get(softwareName)) {
-			this.setState(
-				{
-					loading: true,
-				},
-				() => {
-					softwareApi
-						.getSoftwareVersion(softwareName)
-						.then((softwareWithVersions) => {
-							const { version } = this.state;
-							version.set(softwareName, softwareWithVersions);
-							this.setState({
-								version,
-							});
-						})
-						.finally(() => {
-							this.setState({
-								loading: false,
-							});
-						});
-				}
-			);
+		// console.log(version.get(softwareName) === undefined);
+		// console.log(version);
+		// console.log(softwareName);
+
+		if (version.get(softwareName) === undefined) {
+			this.setState({
+				loading: true,
+			});
+			softwareApi
+				.getSoftwareVersion(softwareName)
+				.then((softwareWithVersions) => {
+					const { version } = this.state;
+					version.set(softwareName, softwareWithVersions);
+					this.setState({
+						version,
+					});
+				})
+				.finally(() => {
+					this.setState({
+						loading: false,
+					});
+				});
 		}
 		const currentSoftware = addSoftware.find((_, i) => i === index);
 		if (currentSoftware!.name !== softwareName) {
@@ -166,14 +165,20 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 		this.forceUpdate();
 	};
 
-	getVersions = (index: number): string[] | undefined => {
+	getVersions = (index: number): string[] => {
 		const name = this.state.addSoftware.find((_, i) => i === index)?.name;
-		return this.state.version.get(name!)?.map((s) => s.version);
+		const allSoftwareOf = this.state.version.get(name!);
+		const list: string[] = [];
+
+		if (allSoftwareOf) allSoftwareOf.forEach((s) => list.push(s.version));
+
+		return list;
 	};
 
 	selectSoftwareVersion = (index: number, softwareVersion: string) => {
 		const currentSoftware = this.state.addSoftware.find((_, i) => i === index);
 		currentSoftware!.version = softwareVersion;
+		this.forceUpdate();
 	};
 
 	render() {
@@ -256,7 +261,6 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 											const currentSoftware = addSoftwareBind.find(
 												(_, i) => i === index
 											);
-											console.log(currentSoftware);
 											return (
 												<SoftwareSelect
 													filterable={false}
@@ -290,10 +294,7 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 															text={Strings.NO_RESULT_FOUND}
 														/>
 													}
-													onItemSelect={(item) => {
-														console.log(item);
-														// this.setState({ addDataRole: item });
-													}}
+													onItemSelect={() => {}}
 												>
 													<Button
 														rightIcon="caret-down"
@@ -316,7 +317,71 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 										render={(value: any, record: Software, index: number) => {
 											if (index < currentCourse!.software.length)
 												return record.version;
-											return 'aaaaaaa';
+
+											const currentSoftware = addSoftwareBind.find(
+												(_, i) => i === index
+											);
+
+											if (
+												!currentSoftware ||
+												currentSoftware.name === undefined ||
+												currentSoftware.name === ''
+											)
+												return (
+													<Button
+														text={Strings.SELECT_SOFTWARE_FIRST}
+														disabled={true}
+													/>
+												);
+
+											return (
+												<SoftwareSelect
+													filterable={false}
+													items={this.getVersions(index)!}
+													itemRenderer={(item, softwareVersionIndex) => {
+														return (
+															<MenuItem
+																text={item}
+																active={
+																	currentSoftware!.version ===
+																	item
+																}
+																onClick={() => {
+																	this.selectSoftwareVersion(
+																		index,
+																		item
+																	);
+																	// this.selectSoftware(
+																	// 	index,
+																	// 	softwareNames.find(
+																	// 		(_, i) =>
+																	// 			i ===
+																	// 			softwareNameIndex.index
+																	// 	)!
+																	// );
+																}}
+															/>
+														);
+													}}
+													noResults={
+														<MenuItem
+															disabled={true}
+															text={Strings.NO_RESULT_FOUND}
+														/>
+													}
+													onItemSelect={() => {}}
+												>
+													<Button
+														rightIcon="caret-down"
+														text={
+															record.version === ''
+																? Strings.SELECT
+																: record.version
+														}
+														disabled={loading}
+													/>
+												</SoftwareSelect>
+											);
 										}}
 									/>
 									<Column
@@ -328,6 +393,7 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 												return (
 													<Button
 														text={Strings.DELETE}
+														disabled={loading}
 														intent={Intent.DANGER}
 														onClick={() => this.removeSoftware(record)}
 													/>

@@ -35,8 +35,10 @@ export class SoftwareApi extends Api {
 		);
 	}
 
-	public getSoftwareVersion<R = Software[]>(name: string): Promise<R> {
-		return this.get<R>(this.GET_SOFTWARE_VERSION + name);
+	public getSoftwareVersion<R = Software[]>(name: string): Promise<R | any[]> {
+		return this.get<[]>(this.GET_SOFTWARE_VERSION + name).then((obj) =>
+			Object.keys(obj).flatMap((k) => obj[+k])
+		);
 	}
 }
 
