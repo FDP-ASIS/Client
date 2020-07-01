@@ -83,6 +83,14 @@ export interface Strings {
 	ROLE: string;
 	NO_SELECTION: string;
 	PLEASE_ENTER_ROLE: string;
+	NO_COURSE_FOUND: string;
+	ADD_OR_REMOVE_SOFTWARE: string;
+	SOFTWARE: string;
+	ADD_NEW_SOFTWARE: string;
+	VERSION: string;
+	SELECT: string;
+	SELECT_SOFTWARE_FIRST: string;
+	REMOVED: string;
 }
 
 enum Languages {

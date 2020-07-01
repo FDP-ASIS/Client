@@ -13,11 +13,11 @@ const initialState: UserState = {
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 	initialState.user = new User(
-		'012345678',
+		'123456780',
 		new Name('first', 'last'),
 		'username',
 		'mail@mail.com',
-		Role.ADMIN
+		Role.LECTURER
 	);
 }
 // else {
