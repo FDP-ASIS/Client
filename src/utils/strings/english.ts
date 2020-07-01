@@ -90,6 +90,7 @@ const english: Strings = {
 	VERSION: 'Version',
 	SELECT: 'Select',
 	SELECT_SOFTWARE_FIRST: 'Please select software first',
+	REMOVED: 'Removed',
 };
 
 export default english;

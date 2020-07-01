@@ -8,9 +8,9 @@ export class Software extends Json {
 	constructor(id?: string, name?: string, version?: string);
 	constructor(id: string, name: string, version: string) {
 		super();
-		this._id = id;
-		this._name = name;
-		this._version = version;
+		this.id = id;
+		this.name = name;
+		this.version = version;
 	}
 
 	/**

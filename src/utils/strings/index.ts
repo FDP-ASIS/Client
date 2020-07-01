@@ -90,6 +90,7 @@ export interface Strings {
 	VERSION: string;
 	SELECT: string;
 	SELECT_SOFTWARE_FIRST: string;
+	REMOVED: string;
 }
 
 enum Languages {

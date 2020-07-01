@@ -15,6 +15,8 @@ export class CourseApi extends Api {
 	private readonly ASSIGN_LECTURER = `${this.ADMIN_BASE}/`; //{code}
 
 	private readonly LECTURER_COURSES = `${this.LECTURER_BASE}/`; //{id}
+	private readonly ADD_SOFTWARE = `${this.LECTURER_BASE}/`; //{id}
+	private readonly REMOVE_SOFTWARE = `${this.LECTURER_BASE}/`; //{id}
 
 	public constructor(config?: AxiosRequestConfig) {
 		super(config);
@@ -28,12 +30,6 @@ export class CourseApi extends Api {
 		this.api.interceptors.response.use((param: AxiosResponse) => ({
 			...param,
 		}));
-
-		this.create = this.create.bind(this);
-		this.getCourses = this.getCourses.bind(this);
-		this.editCourse = this.editCourse.bind(this);
-		this.deleteOne = this.deleteOne.bind(this);
-		this.deleteAll = this.deleteAll.bind(this);
 	}
 
 	public create<R = {}>(courses: Course[]): Promise<R> {
@@ -88,6 +84,14 @@ export class CourseApi extends Api {
 		return this.get<[]>(this.LECTURER_COURSES + lecturerId).then((obj) =>
 			Object.keys(obj).flatMap((k) => obj[+k])
 		);
+	}
+
+	public addSoftware(courseID: number, softwareID: string) {
+		return this.patch(this.ADD_SOFTWARE + courseID, { id: softwareID });
+	}
+
+	public removeSoftware(courseID: number, softwareID: string) {
+		return this.delete(this.REMOVE_SOFTWARE + courseID + '/' + softwareID);
 	}
 }
 

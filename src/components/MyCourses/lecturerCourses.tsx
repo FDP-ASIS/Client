@@ -95,7 +95,7 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 	softwareOptions = (course: Course) => {
 		const addSoftware: Software[] = this.state.addSoftware;
 		for (let software of course.software)
-			addSoftware.push(new Software(software.name, software.version));
+			addSoftware.push(new Software(software.id, software.name, software.version));
 		this.setState({
 			currentCourse: course,
 			overlayIsOpen: true,
@@ -112,8 +112,15 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 	};
 
 	closeOverlay = () => {
+		courseApi.lecturerCourse(this.state.user.id).then((courses) => {
+			this.setState({
+				courses: courses,
+				loading: false,
+			});
+		});
 		this.setState({
 			overlayIsOpen: false,
+			addSoftware: [],
 		});
 	};
 
@@ -122,21 +129,58 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 			this.addToast(Strings.CHECK_YOUR_INFO, Intent.WARNING, 'issue');
 			return;
 		}
+		this.setState({ loading: true });
+		courseApi
+			.addSoftware(this.state.currentCourse!.code, software.id)
+			.then(() => {
+				const { currentCourse, addSoftware } = this.state;
+				currentCourse?.software.push(software);
+				addSoftware.filter((s) => !s.id || s.id !== software.id);
+				this.setState({
+					currentCourse,
+					addSoftware,
+				});
+				// this.forceUpdate()
+				this.addToast(Strings.ADDED, Intent.SUCCESS, 'thumbs-up');
+			})
+			.catch(() => {
+				this.addToast(Strings.CHECK_YOUR_INFO, Intent.DANGER, 'issue');
+			})
+			.finally(() => {
+				this.setState({ loading: false });
+			});
 	};
 
 	removeSoftware = (software: Software) => {
-		const { addSoftware } = this.state;
-		addSoftware.pop();
-		this.setState({
-			addSoftware,
-		});
+		this.setState({ loading: true });
+		courseApi
+			.removeSoftware(this.state.currentCourse!.code, software.id)
+			.then(() => {
+				const { currentCourse, addSoftware } = this.state;
+
+				currentCourse!.software = currentCourse!.software.filter(
+					(s) => s.id !== software.id
+				);
+
+				const addSoftwareNew = addSoftware.filter((s) => !s.id || s.id !== software.id);
+
+				this.setState({
+					currentCourse,
+					addSoftware: addSoftwareNew,
+				});
+
+				this.addToast(Strings.REMOVED, Intent.SUCCESS, 'thumbs-up');
+			})
+			.catch(() => {
+				this.addToast(Strings.CHECK_YOUR_INFO, Intent.DANGER, 'issue');
+			})
+			.finally(() => {
+				this.setState({ loading: false });
+			});
 	};
 
 	selectSoftware = (index: number, softwareName: string) => {
 		const { version, addSoftware } = this.state;
-		// console.log(version.get(softwareName) === undefined);
-		// console.log(version);
-		// console.log(softwareName);
 
 		if (version.get(softwareName) === undefined) {
 			this.setState({
@@ -161,6 +205,7 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 		if (currentSoftware!.name !== softwareName) {
 			currentSoftware!.version = '';
 			currentSoftware!.name = softwareName;
+			currentSoftware!.id = '';
 		}
 		this.forceUpdate();
 	};
@@ -178,6 +223,10 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 	selectSoftwareVersion = (index: number, softwareVersion: string) => {
 		const currentSoftware = this.state.addSoftware.find((_, i) => i === index);
 		currentSoftware!.version = softwareVersion;
+		currentSoftware!.id = this.state.version
+			.get(currentSoftware!.name)!
+			.find((s) => s.version === softwareVersion)?.id!;
+
 		this.forceUpdate();
 	};
 
@@ -257,7 +306,7 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 										align="center"
 										render={(value: any, record: Software, index: number) => {
 											if (index < currentCourse!.software.length)
-												return record.name;
+												return currentCourse!.software[index].name;
 											const currentSoftware = addSoftwareBind.find(
 												(_, i) => i === index
 											);
@@ -316,7 +365,7 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 										align="center"
 										render={(value: any, record: Software, index: number) => {
 											if (index < currentCourse!.software.length)
-												return record.version;
+												return currentCourse!.software[index].version;
 
 											const currentSoftware = addSoftwareBind.find(
 												(_, i) => i === index
@@ -351,14 +400,6 @@ export default class MyCoursesLecturer extends React.Component<Props, State> {
 																		index,
 																		item
 																	);
-																	// this.selectSoftware(
-																	// 	index,
-																	// 	softwareNames.find(
-																	// 		(_, i) =>
-																	// 			i ===
-																	// 			softwareNameIndex.index
-																	// 	)!
-																	// );
 																}}
 															/>
 														);
