@@ -65,7 +65,7 @@ class Main {
 		});
 		this.mainWindow.setMenuBarVisibility(false);
 		this.mainWindow.loadURL(
-			isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../index.html')}`
+			isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../../index.html')}`
 		);
 		if (isDev) {
 			let installExtension: typeof INSTALLER_EXTENSTION = require('electron-devtools-installer');

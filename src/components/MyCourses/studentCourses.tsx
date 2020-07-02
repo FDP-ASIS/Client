@@ -6,6 +6,7 @@ import Strings from '../../utils/strings';
 import { H2, Button, Intent, Spinner, Toaster, IconName } from '@blueprintjs/core';
 import { Row, Col, Table } from 'antd';
 import styled from 'styled-components';
+import { installSoftware, deletionSoftware } from '../../utils/software';
 const { Column } = Table;
 
 export interface Props {
@@ -72,6 +73,7 @@ export default class MyCoursesStudent extends React.Component<Props, State> {
 				this.setState({
 					myCourses: this.state.myCourses.filter((c) => c.code !== course.code),
 				});
+				deletionSoftware(course);
 				this.addToast(Strings.REMOVED, Intent.SUCCESS, 'thumbs-up');
 			})
 			.finally(() => {
@@ -79,7 +81,9 @@ export default class MyCoursesStudent extends React.Component<Props, State> {
 			});
 	};
 
-	installOrUpdate = () => {};
+	installOrUpdate = () => {
+		installSoftware(this.state.myCourses);
+	};
 
 	render() {
 		const { myCourses, loading } = this.state;
@@ -103,6 +107,7 @@ export default class MyCoursesStudent extends React.Component<Props, State> {
 							loading={loading}
 							intent={Intent.PRIMARY}
 							text={Strings.INSTALL_OR_UPDATE_SOFTWARE}
+							onClick={this.installOrUpdate}
 						/>
 					</Col>
 				</Row>

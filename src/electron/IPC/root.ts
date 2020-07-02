@@ -7,6 +7,7 @@ import {
 } from './main/authChannel';
 
 import { ReadDepartmentCSVChannel, ReadCourseCSVChannel, ReadUserCSVChannel } from './main/readCSV';
+import { InstallSoftwareChannel, DeletionSoftwareChannel } from './main/softwareChannel';
 
 interface ClassType<T> {
 	new (...args: any[]): T;
@@ -19,6 +20,8 @@ const ipcsClasses: ClassType<any>[] = [
 	ReadDepartmentCSVChannel,
 	ReadCourseCSVChannel,
 	ReadUserCSVChannel,
+	InstallSoftwareChannel,
+	DeletionSoftwareChannel,
 ];
 
 const ipcs: IpcChannelInterface<any>[] = ipcsClasses.map((clazz) => new clazz());

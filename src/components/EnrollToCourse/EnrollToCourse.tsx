@@ -326,22 +326,31 @@ class EnrollToCourse extends React.Component<Props, State> {
 								<Empty description={Strings.NO_RESULT_FOUND} />
 							</Center>
 						) : (
-							addData.map((course, i) => {
-								return (
-									<Checkbox
-										large
-										checked
-										label={course.code + ' ' + course.name}
-										onChange={() => {
-											// eslint-disable-next-line @typescript-eslint/no-unused-vars
-											const _ = addData.splice(i, 1);
-											this.setState({
-												addData,
-											});
-										}}
-									/>
-								);
-							})
+							<Element
+								name="search"
+								style={{
+									flexGrow: 1,
+									height: '1px',
+									overflow: 'scroll',
+								}}
+							>
+								{addData.map((course, i) => {
+									return (
+										<Checkbox
+											large
+											checked
+											label={course.code + ' ' + course.name}
+											onChange={() => {
+												// eslint-disable-next-line @typescript-eslint/no-unused-vars
+												const _ = addData.splice(i, 1);
+												this.setState({
+													addData,
+												});
+											}}
+										/>
+									);
+								})}
+							</Element>
 						)
 					) : data.length === 0 ? (
 						clicked ? (

@@ -1,5 +1,10 @@
 import { Json } from './json';
 
+export enum ScriptType {
+	INSTALLATION = 'INSTALLATION',
+	DELETION = 'DELETION',
+}
+
 export class Software extends Json {
 	private _id: string;
 	private _name: string;
