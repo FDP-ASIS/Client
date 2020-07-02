@@ -91,6 +91,8 @@ const english: Strings = {
 	SELECT: 'Select',
 	SELECT_SOFTWARE_FIRST: 'Please select software first',
 	REMOVED: 'Removed',
+	SHOW_ALL_SELECTED_COURSES: 'Show all selected',
+	ENROLL_TO_SELECTED_COURSES: 'Enroll to selected',
 };
 
 export default english;

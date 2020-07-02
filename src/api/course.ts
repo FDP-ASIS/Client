@@ -18,6 +18,10 @@ export class CourseApi extends Api {
 	private readonly ADD_SOFTWARE = `${this.LECTURER_BASE}/`; //{id}
 	private readonly REMOVE_SOFTWARE = `${this.LECTURER_BASE}/`; //{id}
 
+	private readonly SEARCH_COURSE = `${this.BASE}/`;
+	private readonly STUDENT_COURSES = `${this.BASE}/`; //{id}
+	private readonly ENROLL = `${this.BASE}/`; //{code}
+
 	public constructor(config?: AxiosRequestConfig) {
 		super(config);
 
@@ -92,6 +96,34 @@ export class CourseApi extends Api {
 
 	public removeSoftware(courseID: number, softwareID: string) {
 		return this.delete(this.REMOVE_SOFTWARE + courseID + '/' + softwareID);
+	}
+
+	public getCoursesUser<R = Course[]>(id: string): Promise<R | any[]> {
+		return this.get<[]>(this.STUDENT_COURSES + id).then((obj) =>
+			Object.keys(obj).flatMap((k) => obj[+k])
+		);
+	}
+
+	public searchCoursesUser<R = Course[]>(name?: string, code?: number): Promise<R | any[]> {
+		let filterType;
+		let filterValue;
+		if (name) {
+			filterType = 'name';
+			filterValue = name;
+		} else {
+			filterType = 'code';
+			filterValue = code;
+		}
+		return this.get<[]>(this.SEARCH_COURSE, {
+			params: {
+				filterType,
+				filterValue,
+			},
+		}).then((obj) => Object.keys(obj).flatMap((k) => obj[+k]));
+	}
+
+	public enroll(code: number, id: string) {
+		return this.patch(this.ENROLL + code + '?id=' + id);
 	}
 }
 
