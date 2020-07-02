@@ -1,7 +1,29 @@
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Api } from './config/api';
-import { Software } from '../models/software';
+import { Software, ScriptType } from '../models/software';
+class ScriptClass {
+	private _download_url: string;
 
+	constructor(download_url: string) {
+		this._download_url = download_url;
+	}
+
+	/**
+	 * Getter download_url
+	 * @return {string}
+	 */
+	public get download_url(): string {
+		return this._download_url;
+	}
+
+	/**
+	 * Setter download_url
+	 * @param {string} value
+	 */
+	public set download_url(value: string) {
+		this._download_url = value;
+	}
+}
 export class SoftwareApi extends Api {
 	private readonly BASE = 'software';
 
@@ -39,6 +61,14 @@ export class SoftwareApi extends Api {
 		return this.get<[]>(this.GET_SOFTWARE_VERSION + name).then((obj) =>
 			Object.keys(obj).flatMap((k) => obj[+k])
 		);
+	}
+
+	public getScript(name: string, version: string, type: ScriptType): Promise<string> {
+		return this.get<any>(this.GET_SOFTWARE_SCRIPT(name, version), {
+			params: {
+				type: type,
+			},
+		}).then((s) => (s as ScriptClass).download_url);
 	}
 }
 

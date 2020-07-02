@@ -17,7 +17,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 		new Name('first', 'last'),
 		'username',
 		'mail@mail.com',
-		Role.LECTURER
+		Role.STUDENT
 	);
 }
 // else {

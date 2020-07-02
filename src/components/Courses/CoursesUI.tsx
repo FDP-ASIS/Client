@@ -28,7 +28,7 @@ import {
 // import { Element } from 'react-scroll';
 import { Course } from '../../models/course';
 import { readCourseCSV } from '../../utils/readCSV';
-import { CourseApi } from '../../api/course';
+import { courseApi } from '../../api/course';
 import { IconName } from '@blueprintjs/core';
 import { User } from '../../models/user';
 
@@ -87,11 +87,9 @@ const Center = styled(H2)`
 
 export default class CoursesUI extends React.Component<Props, State> {
 	inputReference: React.RefObject<HTMLInputElement> = React.createRef();
-	courseApi: CourseApi;
 
 	constructor(props: Props) {
 		super(props);
-		this.courseApi = new CourseApi();
 		this.state = {
 			loading: false,
 			clicked: false,
@@ -136,7 +134,7 @@ export default class CoursesUI extends React.Component<Props, State> {
 			this.setState({
 				loading: true,
 			});
-			this.courseApi
+			courseApi
 				.create(this.state.addData)
 				.then(() => {
 					this.closeOverlay();
@@ -161,12 +159,15 @@ export default class CoursesUI extends React.Component<Props, State> {
 
 		const { searchName, searchCode } = this.state;
 		this.setState({ loading: true, clicked: true });
-		this.courseApi
+		courseApi
 			.getCourses(currentPage, searchName, searchCode)
 			.then((result) => {
 				this.setState({ data: result });
 			})
-			.then(() => this.courseApi.getCourses(currentPage! + 1, searchName, searchCode))
+			// .catch(()=>{
+			// 	this.setState({ data: [result] });
+			// })
+			.then(() => courseApi.getCourses(currentPage! + 1, searchName, searchCode))
 			.then((res) =>
 				this.setState({
 					hasNextPage: res.length > 0 && searchName !== undefined ? true : false,
@@ -198,7 +199,7 @@ export default class CoursesUI extends React.Component<Props, State> {
 		this.setState({
 			loading: true,
 		});
-		this.courseApi
+		courseApi
 			.editCourse(this.state.currentCourseCode!, this.state.currentCourse!)
 			.then(() => {
 				this.closeOverlay();
@@ -218,8 +219,8 @@ export default class CoursesUI extends React.Component<Props, State> {
 
 	deleteConfirm = () => {
 		let deleteId = this.state.delete!;
-		if (deleteId) this.courseApi.deleteOne(deleteId);
-		else this.courseApi.deleteAll();
+		if (deleteId) courseApi.deleteOne(deleteId);
+		else courseApi.deleteAll();
 		this.setState({
 			isOpenAlert: false,
 			delete: null,
@@ -293,10 +294,10 @@ export default class CoursesUI extends React.Component<Props, State> {
 	assignLecturerConfirm = () => {
 		const { currentCourse, lecturerID } = this.state;
 		this.setState({ loading: true });
-		this.courseApi
+		courseApi
 			.assignLecturer(currentCourse!.code, lecturerID!)
 			.then((res) => {
-				this.courseApi
+				courseApi
 					.getCourses(0, undefined, currentCourse!.code)
 					.then((res) => {
 						this.setState({
@@ -324,8 +325,8 @@ export default class CoursesUI extends React.Component<Props, State> {
 		const { currentCourse } = this.state;
 		this.setState({ loading: true });
 
-		this.courseApi.removeLecturer(currentCourse!.code, id).then(() => {
-			this.courseApi
+		courseApi.removeLecturer(currentCourse!.code, id).then(() => {
+			courseApi
 				.getCourses(0, undefined, currentCourse!.code)
 				.then((res) =>
 					this.setState({
