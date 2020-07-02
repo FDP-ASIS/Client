@@ -91,6 +91,7 @@ class EnrollToCourse extends React.Component<Props, State> {
 	}
 
 	private setMeCourses = () => {
+		this.setState({ loading: true });
 		courseApi
 			.getCoursesUser(this.state.user.id)
 			.then((myCourses) => {

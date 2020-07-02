@@ -93,6 +93,8 @@ export interface Strings {
 	REMOVED: string;
 	SHOW_ALL_SELECTED_COURSES: string;
 	ENROLL_TO_SELECTED_COURSES: string;
+	INSTALL_OR_UPDATE_SOFTWARE: string;
+	REMOVE: string;
 }
 
 enum Languages {

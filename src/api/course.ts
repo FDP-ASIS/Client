@@ -125,6 +125,10 @@ export class CourseApi extends Api {
 	public enroll(code: number, id: string) {
 		return this.patch(this.ENROLL + code + '?id=' + id);
 	}
+
+	public removeStudentFromCourse(code: number, id: string) {
+		return this.delete(this.ENROLL + code + '?id=' + id);
+	}
 }
 
 export const courseApi = new CourseApi();

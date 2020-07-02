@@ -93,6 +93,8 @@ const english: Strings = {
 	REMOVED: 'Removed',
 	SHOW_ALL_SELECTED_COURSES: 'Show all selected',
 	ENROLL_TO_SELECTED_COURSES: 'Enroll to selected',
+	INSTALL_OR_UPDATE_SOFTWARE: 'Install or update software',
+	REMOVE: 'Remove',
 };
 
 export default english;
