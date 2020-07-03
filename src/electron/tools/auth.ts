@@ -1,16 +1,16 @@
 import { sharedPreferences } from '../store/store';
-import { AuthKeys } from '../store/keys/auth';
+import { Keys } from '../store/keys/auth';
 
 export const getAuthTokenStore = (): string | null => {
-	return sharedPreferences.get(AuthKeys.Token, null);
+	return sharedPreferences.get(Keys.AuthToken, null);
 };
 
 export const setAuthTokenStore = (token: string): boolean => {
-	sharedPreferences.set(AuthKeys.Token, token);
+	sharedPreferences.set(Keys.AuthToken, token);
 	return true;
 };
 
 export const removeAuthTokenStore = (): boolean => {
-	sharedPreferences.delete(AuthKeys.Token);
+	sharedPreferences.delete(Keys.AuthToken);
 	return true;
 };

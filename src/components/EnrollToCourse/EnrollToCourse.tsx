@@ -135,6 +135,12 @@ class EnrollToCourse extends React.Component<Props, State> {
 		const newMyCourses = this.state.myCourses.concat(this.state.addData);
 		this.setState({
 			myCourses: newMyCourses,
+			addData: [],
+			clicked: false,
+			showAllSelected: false,
+			searchCode: undefined,
+			searchName: '',
+			data: [],
 		});
 		this.addToast(Strings.ADDED, Intent.SUCCESS, 'thumbs-up');
 		this.setState({

@@ -1,3 +1,4 @@
-export enum AuthKeys {
-	Token = 'Token',
+export enum Keys {
+	AuthToken = 'AuthToken',
+	Software = 'Software',
 }

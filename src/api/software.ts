@@ -29,6 +29,7 @@ export class SoftwareApi extends Api {
 
 	private readonly GET_SOFTWARE_NAME = this.BASE;
 	private readonly GET_SOFTWARE_VERSION = `${this.BASE}/`; //{name}
+	private readonly GET_SOFTWARE = `${this.BASE}/id/`; //{id}
 
 	private GET_SOFTWARE_SCRIPT = (name: string, version: string): string =>
 		`${this.BASE}/${name}/${version}`;
@@ -69,6 +70,10 @@ export class SoftwareApi extends Api {
 				type: type,
 			},
 		}).then((s) => (s as ScriptClass).download_url);
+	}
+
+	public getSoftware<R = Software>(id: string): Promise<R> {
+		return this.get<R>(this.GET_SOFTWARE + id);
 	}
 }
 

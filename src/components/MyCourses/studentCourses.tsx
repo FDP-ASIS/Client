@@ -70,10 +70,11 @@ export default class MyCoursesStudent extends React.Component<Props, State> {
 		courseApi
 			.removeStudentFromCourse(course.code, this.state.user.id)
 			.then(() => {
+				const myCourses = this.state.myCourses.filter((c) => c.code !== course.code);
 				this.setState({
-					myCourses: this.state.myCourses.filter((c) => c.code !== course.code),
+					myCourses: myCourses,
 				});
-				deletionSoftware(course);
+				deletionSoftware(myCourses, course);
 				this.addToast(Strings.REMOVED, Intent.SUCCESS, 'thumbs-up');
 			})
 			.finally(() => {
