@@ -95,6 +95,9 @@ const english: Strings = {
 	ENROLL_TO_SELECTED_COURSES: 'Enroll to selected',
 	INSTALL_OR_UPDATE_SOFTWARE: 'Install or update software',
 	REMOVE: 'Remove',
+	SOFTWARE_NEED_TO_INSTALL: 'Software to install',
+	SOFTWARE_NEED_TO_REMOVE: 'Software to remove',
+	NOTHING_TO_INSTALL_OR_REMOVE: 'Nothing to install or remove',
 };
 
 export default english;

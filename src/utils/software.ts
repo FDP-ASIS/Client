@@ -6,6 +6,81 @@ import { ScriptType, Software } from '../models/software';
 
 const ipc = new IpcService();
 
+class MySoftware {
+	private _needToInstallSoftware: Software[];
+	private _needToRemoveSoftware: Software[];
+
+	constructor(needToInstallSoftware: Software[], needToRemoveSoftware: Software[]) {
+		this.needToInstallSoftware = needToInstallSoftware;
+		this.needToRemoveSoftware = needToRemoveSoftware;
+	}
+
+	/**
+	 * Getter _meedToInstallSoftware
+	 * @return {Software[]}
+	 */
+	public get needToInstallSoftware(): Software[] {
+		return this._needToInstallSoftware;
+	}
+
+	/**
+	 * Getter _needToRemoveSoftware
+	 * @return {Software[]}
+	 */
+	public get needToRemoveSoftware(): Software[] {
+		return this._needToRemoveSoftware;
+	}
+
+	/**
+	 * Setter _meedToInstallSoftware
+	 * @param {Software[]} value
+	 */
+	public set needToInstallSoftware(value: Software[]) {
+		this._needToInstallSoftware = value;
+	}
+
+	/**
+	 * Setter _needToRemoveSoftware
+	 * @param {Software[]} value
+	 */
+	public set needToRemoveSoftware(value: Software[]) {
+		this._needToRemoveSoftware = value;
+	}
+}
+
+export const getNeedToInstallSoftware = async (currentCourses: Course[]): Promise<MySoftware> => {
+	const meedToInstallSoftware: Software[] = [];
+	const needToRemoveSoftware: Software[] = [];
+	const needToRemoveSoftwareId: string[] = [];
+
+	const { mySoftwareIds } = await ipc.send<{ mySoftwareIds: string[] }, {}>(
+		SoftwareChannels.GetInstalledSoftware
+	);
+
+	currentCourses.forEach((c) =>
+		c.software.forEach((s) => {
+			if (meedToInstallSoftware.findIndex((myS) => myS.id === s.id) === -1) {
+				meedToInstallSoftware.push(s);
+			}
+		})
+	);
+
+	mySoftwareIds.forEach((s) => {
+		const meedToInstallSoftwareIndex = meedToInstallSoftware.findIndex(
+			(needToIns) => needToIns.id === s
+		);
+		if (meedToInstallSoftwareIndex >= 0)
+			meedToInstallSoftware.slice(meedToInstallSoftwareIndex, 1);
+		else needToRemoveSoftwareId.push(s);
+	});
+
+	for (let id of needToRemoveSoftwareId) {
+		const s = await softwareApi.getSoftware(id);
+		needToRemoveSoftware.push(s);
+	}
+	return new MySoftware(meedToInstallSoftware, needToRemoveSoftware);
+};
+
 export const installSoftware = async (courses: Course[]) => {
 	const meedToInstallSoftware: Software[] = [];
 	const needToRemoveSoftwareId: string[] = [];
@@ -13,6 +88,7 @@ export const installSoftware = async (courses: Course[]) => {
 	const { mySoftwareIds } = await ipc.send<{ mySoftwareIds: string[] }, {}>(
 		SoftwareChannels.GetInstalledSoftware
 	);
+
 	courses.forEach((c) =>
 		c.software.forEach((s) => {
 			if (meedToInstallSoftware.findIndex((myS) => myS.id === s.id) === -1) {

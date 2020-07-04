@@ -95,6 +95,9 @@ export interface Strings {
 	ENROLL_TO_SELECTED_COURSES: string;
 	INSTALL_OR_UPDATE_SOFTWARE: string;
 	REMOVE: string;
+	SOFTWARE_NEED_TO_INSTALL: string;
+	SOFTWARE_NEED_TO_REMOVE: string;
+	NOTHING_TO_INSTALL_OR_REMOVE: string;
 }
 
 enum Languages {
