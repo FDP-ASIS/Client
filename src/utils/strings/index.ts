@@ -95,6 +95,13 @@ export interface Strings {
 	ENROLL_TO_SELECTED_COURSES: string;
 	INSTALL_OR_UPDATE_SOFTWARE: string;
 	REMOVE: string;
+	MY_PROFILE: string;
+	EDIT_PROFILE: string;
+	CHANGE_PASSWORD: string;
+	CURRENT_PASSWORD: string;
+	SET_NEW_PASSWORD: string;
+	CONFIRM_PASSWORD: string;
+	PROJECT_STORY: string;
 }
 
 enum Languages {

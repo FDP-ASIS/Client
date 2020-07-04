@@ -15,7 +15,7 @@ const english: Strings = {
 	LOGIN_FAILED: 'Username or password is invalid',
 	HELLO: 'Hello,',
 	PROFILE: 'Profile',
-	ABOUT_US: 'About Us',
+	ABOUT_US: 'About',
 	LOGOUT: 'Logout',
 	LOGOUT_WAITING: 'Logout, please be patient',
 	MY_COURSES: 'My Courses',
@@ -95,6 +95,13 @@ const english: Strings = {
 	ENROLL_TO_SELECTED_COURSES: 'Enroll to selected',
 	INSTALL_OR_UPDATE_SOFTWARE: 'Install or update software',
 	REMOVE: 'Remove',
+	MY_PROFILE: 'My Profile',
+	EDIT_PROFILE: 'Edit Profile',
+	CHANGE_PASSWORD: 'Change password',
+	CURRENT_PASSWORD: 'Current password',
+	SET_NEW_PASSWORD: 'New password',
+	CONFIRM_PASSWORD: 'Confirm password',
+	PROJECT_STORY: 'Project story',
 };
 
 export default english;
