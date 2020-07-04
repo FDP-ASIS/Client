@@ -94,6 +94,9 @@ const english: Strings = {
 	SHOW_ALL_SELECTED_COURSES: 'Show all selected',
 	ENROLL_TO_SELECTED_COURSES: 'Enroll to selected',
 	INSTALL_OR_UPDATE_SOFTWARE: 'Install or update software',
+	SOFTWARE_NEED_TO_INSTALL: 'Software to install',
+	SOFTWARE_NEED_TO_REMOVE: 'Software to remove',
+	NOTHING_TO_INSTALL_OR_REMOVE: 'Nothing to install or remove',
 	REMOVE: 'Remove',
 	MY_PROFILE: 'My Profile',
 	EDIT_PROFILE: 'Edit Profile',
@@ -102,6 +105,7 @@ const english: Strings = {
 	SET_NEW_PASSWORD: 'New password',
 	CONFIRM_PASSWORD: 'Confirm password',
 	PROJECT_STORY: 'Project story',
+	PASSWORD_CHANGED: 'Your password has been changed',
 };
 
 export default english;

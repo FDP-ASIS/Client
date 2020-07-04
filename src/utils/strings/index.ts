@@ -95,6 +95,9 @@ export interface Strings {
 	ENROLL_TO_SELECTED_COURSES: string;
 	INSTALL_OR_UPDATE_SOFTWARE: string;
 	REMOVE: string;
+	SOFTWARE_NEED_TO_INSTALL: string;
+	SOFTWARE_NEED_TO_REMOVE: string;
+	NOTHING_TO_INSTALL_OR_REMOVE: string;
 	MY_PROFILE: string;
 	EDIT_PROFILE: string;
 	CHANGE_PASSWORD: string;
@@ -102,6 +105,7 @@ export interface Strings {
 	SET_NEW_PASSWORD: string;
 	CONFIRM_PASSWORD: string;
 	PROJECT_STORY: string;
+	PASSWORD_CHANGED: string;
 }
 
 enum Languages {
