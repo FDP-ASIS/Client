@@ -7,7 +7,6 @@ import pycharm from '../../assets/pycharm.png';
 import python from '../../assets/python.png';
 import eclipse from '../../assets/eclipse.png';
 import java from '../../assets/java.png';
-import { Footer } from '../Footer/Footer';
 
 export interface Props {
 	children?: React.ReactNode;
@@ -25,10 +24,6 @@ const FillAllPage = styled.div`
 
 const H3Align = styled(H3)`
 	text-align: center;
-`;
-
-const H5Align = styled(H4)`
-	color: navy;
 `;
 
 const H4Color = styled(H4)`
@@ -133,12 +128,10 @@ export default class AboutUs extends React.Component<Props, State> {
 
 					<Row gutter={[100, 16]}>
 						<Col>
-							{' '}
 							<b> &copy; Copyright 2020 All rights reserved. </b>
 						</Col>
 						<Col>
-							{' '}
-							<H5Align> Enjoy! </H5Align>
+							<H4Color> Enjoy! </H4Color>
 						</Col>
 					</Row>
 				</FillAllPage>
