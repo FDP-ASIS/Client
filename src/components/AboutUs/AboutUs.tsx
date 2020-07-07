@@ -57,11 +57,12 @@ export default class AboutUs extends React.Component<Props, State> {
 					<H4Color> {Strings.PROJECT_STORY} </H4Color>
 					<p>
 						Automatic Installation is a standard academic final degree project in
-						software engineering. It was created for "Afeka Tel Aviv Academic College of
-						Engineering" which makes the software installation process in the various
-						courses a fully automated, non-contact process. All you need to do is just
-						select your courses and start downloading the linked software to your
-						computer.
+						software engineering.
+						<br /> It was created for "Afeka Tel Aviv Academic College of Engineering"
+						which makes the software installation process in the various courses a fully
+						automated, non-contact process.
+						<br /> All you need to do is just select your courses and start downloading
+						the software to your computer.
 					</p>
 					<H4Color>{Strings.SOFTWARE}</H4Color>
 					<H5Color> IDE (Integrated Development Environment)- </H5Color>
