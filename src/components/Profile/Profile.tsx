@@ -5,14 +5,12 @@ import {
 	Button,
 	Classes,
 	FormGroup,
-	H2,
 	H3,
 	H5,
 	IconName,
 	InputGroup,
 	Intent,
 	Overlay,
-	Spinner,
 	Toaster,
 	Tooltip,
 } from '@blueprintjs/core';
@@ -58,16 +56,6 @@ const FillAllPage = styled.div`
 	flex-direction: column;
 `;
 
-const Center = styled(H2)`
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	margin: auto;
-	flex-grow: 1;
-	text-align: center;
-`;
-
 const H5Color = styled(H5)`
 	color: navy;
 `;
@@ -83,12 +71,7 @@ const Logo = styled.img<{ src: string }>`
 	height: 80px;
 `;
 
-const ProfileHelper: React.FunctionComponent = () => {
-	const user = useSelector(selectUser);
-	return <Profile user={user!} />;
-};
-
-export default ProfileHelper;
+export default () => <Profile user={useSelector(selectUser)!} />;
 
 class Profile extends React.Component<Props, State> {
 	userApi: UserApi;
@@ -124,23 +107,22 @@ class Profile extends React.Component<Props, State> {
 	private handleLockClick3 = () =>
 		this.setState({ showPasswordConfirm: !this.state.showPasswordConfirm });
 
-	private isNewPasswordValid = (event: React.FormEvent<HTMLInputElement>) => {
-		if (event.currentTarget.value.length < 5 || event.currentTarget.value.length > 15)
-			this.setState({ intentNew: Intent.DANGER, newPassword: event.currentTarget.value });
-		else this.setState({ intentNew: Intent.SUCCESS, newPassword: event.currentTarget.value });
+	private isNewPasswordValid = ({
+		currentTarget: { value: newPassword },
+	}: React.FormEvent<HTMLInputElement>) => {
+		const intentNew =
+			newPassword.length < 5 || newPassword.length > 15 ? Intent.DANGER : Intent.SUCCESS;
+		this.setState({ intentNew, newPassword });
 	};
 
-	private isCurrentPasswordValid = (event: React.FormEvent<HTMLInputElement>) => {
-		if (event.currentTarget.value.length < 5 || event.currentTarget.value.length > 15)
-			this.setState({
-				intentCurrent: Intent.DANGER,
-				currentPassword: event.currentTarget.value,
-			});
-		else
-			this.setState({
-				intentCurrent: Intent.SUCCESS,
-				currentPassword: event.currentTarget.value,
-			});
+	private isCurrentPasswordValid = ({
+		currentTarget: { value: currentPassword },
+	}: React.FormEvent<HTMLInputElement>) => {
+		const intentCurrent =
+			currentPassword.length < 5 || currentPassword.length > 15
+				? Intent.DANGER
+				: Intent.SUCCESS;
+		this.setState({ intentCurrent, currentPassword });
 	};
 
 	private isPasswordMatch = (newPassword: string, event: React.FormEvent<HTMLInputElement>) => {
@@ -151,7 +133,7 @@ class Profile extends React.Component<Props, State> {
 				equalPassword: false,
 			});
 		else {
-			if (newPassword != event.currentTarget.value)
+			if (newPassword !== event.currentTarget.value)
 				this.setState({
 					intentConfirm: Intent.DANGER,
 					confirmPassword: event.currentTarget.value,
@@ -172,33 +154,41 @@ class Profile extends React.Component<Props, State> {
 		confirmPassword: string,
 		equalPassword: boolean
 	) => {
-		if (!currentPassword && !newPassword && !confirmPassword) {
+		if (
+			(!currentPassword && !newPassword && !confirmPassword) ||
+			!currentPassword ||
+			!newPassword ||
+			!confirmPassword
+		) {
 			this.addToast(Strings.FILL_ALL_FIELDS, Intent.DANGER, 'error');
 			this.setState({
 				intentConfirm: Intent.DANGER,
 				intentCurrent: Intent.DANGER,
 				intentNew: Intent.DANGER,
 			});
-		} else if (!currentPassword || !newPassword || !confirmPassword) {
-			this.addToast(Strings.FILL_ALL_FIELDS, Intent.DANGER, 'error');
 		} else {
-			if (!equalPassword) this.addToast(Strings.PASSWORD_NOT_MATCHED, Intent.DANGER, 'error');
+			if (newPassword.length < 5 || newPassword.length > 15)
+				this.addToast(Strings.PASSWORD_TOO_SHORT, Intent.DANGER, 'error');
 			else {
-				this.userApi
-					.updatePassword(this.state.user.id, currentPassword, newPassword)
-					.then(() => {
-						this.closeOverlay();
-						this.addToast(Strings.PASSWORD_CHANGED, Intent.SUCCESS, 'updated');
-						this.setState({
-							currentPassword: '',
-							newPassword: '',
-							confirmPassword: '',
+				if (!equalPassword)
+					this.addToast(Strings.PASSWORD_NOT_MATCHED, Intent.DANGER, 'error');
+				else {
+					this.userApi
+						.updatePassword(this.state.user.id, currentPassword, newPassword)
+						.then(() => {
+							this.closeOverlay();
+							this.addToast(Strings.PASSWORD_CHANGED, Intent.SUCCESS, 'updated');
+							this.setState({
+								currentPassword: '',
+								newPassword: '',
+								confirmPassword: '',
+							});
+						})
+						.catch((error) => {
+							console.log(error);
+							this.addToast(Strings.WRONG_CURRENT_PASSWORD, Intent.DANGER, 'error');
 						});
-					})
-					.catch((error) => {
-						console.log(error);
-						this.addToast(Strings.WRONG_CURRENT_PASSWORD, Intent.DANGER, 'error');
-					});
+				}
 			}
 		}
 	};
@@ -207,7 +197,7 @@ class Profile extends React.Component<Props, State> {
 		if (this.toaster) this.toaster.show({ message: reason, intent: color, icon: icon });
 	};
 
-	closeOverlay = () => {
+	private closeOverlay = () => {
 		this.setState({
 			OverlayIsOpen: false,
 			currentPassword: '',
@@ -215,10 +205,11 @@ class Profile extends React.Component<Props, State> {
 			confirmPassword: '',
 			intentNew: 'none',
 			intentConfirm: 'none',
+			intentCurrent: 'none',
 		});
 	};
 
-	LockButton = ({ showPassword, onClick }: { showPassword: any; onClick: any }) => {
+	private LockButton = ({ showPassword, onClick }: { showPassword: any; onClick: any }) => {
 		return (
 			<Tooltip
 				content={`${showPassword ? Strings.HIDE : Strings.SHOW} ${Strings.PASSWORD}`}
@@ -275,8 +266,7 @@ class Profile extends React.Component<Props, State> {
 								<Row>
 									<Col span={10}>
 										<H3 style={{ marginBottom: '20px' }}>
-											{' '}
-											{Strings.CHANGE_PASSWORD}{' '}
+											{Strings.CHANGE_PASSWORD}
 										</H3>
 									</Col>
 									<Col span={6} offset={8} style={{ marginBottom: '5%' }}>
@@ -299,11 +289,7 @@ class Profile extends React.Component<Props, State> {
 												minLength={5}
 												maxLength={15}
 												intent={this.state.intentCurrent}
-												onChange={(
-													event: React.FormEvent<HTMLInputElement>
-												) => {
-													this.isCurrentPasswordValid(event);
-												}}
+												onChange={this.isCurrentPasswordValid}
 											/>
 										</FormGroup>
 									</Col>
@@ -324,11 +310,7 @@ class Profile extends React.Component<Props, State> {
 												minLength={5}
 												maxLength={15}
 												intent={this.state.intentNew}
-												onChange={(
-													event: React.FormEvent<HTMLInputElement>
-												) => {
-													this.isNewPasswordValid(event);
-												}}
+												onChange={this.isNewPasswordValid}
 											/>
 										</FormGroup>
 									</Col>
@@ -361,17 +343,6 @@ class Profile extends React.Component<Props, State> {
 										</FormGroup>
 									</Col>
 								</Row>
-								<div
-									style={{
-										height: '50%',
-									}}
-								>
-									{loading ? (
-										<Center style={{ zIndex: 1 }}>
-											<Spinner />
-										</Center>
-									) : null}
-								</div>
 							</>
 						}
 						<div
@@ -381,20 +352,18 @@ class Profile extends React.Component<Props, State> {
 							<Button
 								intent={Intent.DANGER}
 								disabled={loading}
-								onClick={() => this.closeOverlay()}
-								style={{ margin: '' }}
+								onClick={this.closeOverlay}
 							>
 								{Strings.CLOSE}
 							</Button>
 							<Button
 								disabled={loading}
 								intent={Intent.PRIMARY}
-								style={{ margin: '' }}
 								onClick={() =>
 									this.onSubmit(
-										this.state.currentPassword,
-										this.state.newPassword,
-										this.state.confirmPassword,
+										currentPassword,
+										newPassword,
+										confirmPassword,
 										this.state.equalPassword
 									)
 								}
@@ -415,10 +384,7 @@ class Profile extends React.Component<Props, State> {
 											<H5Color>{Strings.ID}</H5Color>
 										</Col>
 										<Col span={10}>
-											<InputGroup
-												value={this.props.user.id}
-												disabled={true}
-											/>
+											<InputGroup value={this.state.user.id} disabled />
 										</Col>
 									</Row>
 									<div style={{ marginTop: '10px' }}>
@@ -428,7 +394,7 @@ class Profile extends React.Component<Props, State> {
 											</Col>
 											<Col span={10}>
 												<InputGroup
-													value={this.props.user.username}
+													value={this.state.user.username}
 													disabled={true}
 												/>
 											</Col>
@@ -442,8 +408,8 @@ class Profile extends React.Component<Props, State> {
 											</Col>
 											<Col span={10}>
 												<InputGroup
-													value={this.props.user.name.first}
-													disabled={true}
+													value={this.state.user.name.first}
+													disabled
 												/>
 											</Col>
 										</Row>
@@ -456,8 +422,8 @@ class Profile extends React.Component<Props, State> {
 											</Col>
 											<Col span={10}>
 												<InputGroup
-													value={this.props.user.name.last}
-													disabled={true}
+													value={this.state.user.name.last}
+													disabled
 												/>
 											</Col>
 										</Row>
@@ -470,8 +436,8 @@ class Profile extends React.Component<Props, State> {
 											</Col>
 											<Col span={10}>
 												<InputGroup
-													value={this.props.user.email}
-													disabled={true}
+													value={this.state.user.email}
+													disabled
 												/>
 											</Col>
 										</Row>
@@ -482,10 +448,7 @@ class Profile extends React.Component<Props, State> {
 												<H5Color>{Strings.ROLE}</H5Color>
 											</Col>
 											<Col span={10}>
-												<InputGroup
-													value={this.props.user.role}
-													disabled={true}
-												/>
+												<InputGroup value={this.state.user.role} disabled />
 											</Col>
 										</Row>
 									</div>
@@ -497,7 +460,7 @@ class Profile extends React.Component<Props, State> {
 											alignItems: 'center',
 										}}
 									>
-										<Logo src={profPic}></Logo>
+										<Logo src={profPic} />
 									</div>
 								</>
 							</div>
@@ -508,7 +471,7 @@ class Profile extends React.Component<Props, State> {
 									intent={Intent.WARNING}
 									alignText={Alignment.LEFT}
 									rightIcon={'edit'}
-									fill={true}
+									fill
 									disabled={loading}
 									text={Strings.EDIT_PROFILE}
 									onClick={() =>
