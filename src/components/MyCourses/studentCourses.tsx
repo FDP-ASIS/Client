@@ -3,10 +3,23 @@ import { User } from '../../models/user';
 import { Course } from '../../models/course';
 import { courseApi } from '../../api/course';
 import Strings from '../../utils/strings';
-import { H2, Button, Intent, Spinner, Toaster, IconName } from '@blueprintjs/core';
+import {
+	H2,
+	Button,
+	Intent,
+	Spinner,
+	Toaster,
+	IconName,
+	Overlay,
+	Classes,
+	H3,
+	H5,
+} from '@blueprintjs/core';
 import { Row, Col, Table } from 'antd';
 import styled from 'styled-components';
-import { installSoftware, deletionSoftware } from '../../utils/software';
+import { installSoftware, getNeedToInstallSoftware } from '../../utils/software';
+import classNames from 'classnames';
+import { Software } from '../../models/software';
 const { Column } = Table;
 
 export interface Props {
@@ -17,6 +30,9 @@ export interface State {
 	myCourses: Course[];
 	user: User;
 	loading: boolean;
+	needToConfirm: boolean;
+	needToInstall: Software[];
+	needToRemove: Software[];
 }
 
 const Center = styled(H2)`
@@ -29,6 +45,8 @@ const Center = styled(H2)`
 	text-align: center;
 `;
 
+const OVERLAY_CLASS = 'overlay-transition';
+
 export default class MyCoursesStudent extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
@@ -37,6 +55,9 @@ export default class MyCoursesStudent extends React.Component<Props, State> {
 			myCourses: [],
 			user: props.user,
 			loading: false,
+			needToConfirm: false,
+			needToInstall: [],
+			needToRemove: [],
 		};
 	}
 
@@ -74,7 +95,7 @@ export default class MyCoursesStudent extends React.Component<Props, State> {
 				this.setState({
 					myCourses: myCourses,
 				});
-				deletionSoftware(myCourses, course);
+				// deletionSoftware(myCourses, course);
 				this.addToast(Strings.REMOVED, Intent.SUCCESS, 'thumbs-up');
 			})
 			.finally(() => {
@@ -83,11 +104,41 @@ export default class MyCoursesStudent extends React.Component<Props, State> {
 	};
 
 	installOrUpdate = () => {
+		getNeedToInstallSoftware(this.state.myCourses).then((s) => {
+			if (s.needToInstallSoftware.length === 0 && s.needToRemoveSoftware.length === 0) {
+				this.addToast(Strings.NOTHING_TO_INSTALL_OR_REMOVE, Intent.PRIMARY, 'clean');
+			} else
+				this.setState({
+					needToInstall: s.needToInstallSoftware,
+					needToRemove: s.needToRemoveSoftware,
+					needToConfirm: true,
+				});
+		});
+	};
+	private softwareTimeout: number | undefined;
+
+	confirmInstallOrUpdate = () => {
+		this.setState({
+			loading: true,
+		});
 		installSoftware(this.state.myCourses);
+
+		this.softwareTimeout = setTimeout(() => {
+			this.setState({
+				loading: false,
+				needToConfirm: false,
+			});
+		}, 3000);
 	};
 
+	componentWillUnmount() {
+		clearTimeout(this.softwareTimeout);
+	}
+
 	render() {
-		const { myCourses, loading } = this.state;
+		const { myCourses, loading, needToConfirm, needToInstall, needToRemove } = this.state;
+		const classes = classNames(Classes.CARD, Classes.ELEVATION_4, OVERLAY_CLASS);
+
 		return (
 			<>
 				<Toaster
@@ -96,6 +147,82 @@ export default class MyCoursesStudent extends React.Component<Props, State> {
 					maxToasts={1}
 					ref={(ref: Toaster) => (this.toaster = ref)}
 				/>
+				<Overlay isOpen={needToConfirm} usePortal>
+					<div className={classes} style={{ color: 'black' }}>
+						{needToInstall.length !== 0 ? (
+							<>
+								<Row gutter={[20, 6]}>
+									<Col>
+										<H3>{Strings.SOFTWARE_NEED_TO_INSTALL}</H3>
+									</Col>
+								</Row>
+								{needToInstall.map((s) => {
+									return (
+										<Row>
+											<Col span={12}>
+												<H5>
+													{Strings.NAME}: {s.name}
+												</H5>
+											</Col>
+											<Col span={12}>
+												<H5>
+													{Strings.VERSION}: {s.version}
+												</H5>
+											</Col>
+										</Row>
+									);
+								})}
+							</>
+						) : null}
+						{needToRemove.length !== 0 ? (
+							<>
+								<Row gutter={[20, 6]} style={{ marginTop: '20px' }}>
+									<Col>
+										<H3>{Strings.SOFTWARE_NEED_TO_REMOVE}</H3>
+									</Col>
+								</Row>
+								{needToRemove.map((s) => {
+									return (
+										<Row>
+											<Col span={12}>
+												<H5>
+													{Strings.NAME}: {s.name}
+												</H5>
+											</Col>
+											<Col span={12}>
+												<H5>
+													{Strings.VERSION}: {s.version}
+												</H5>
+											</Col>
+										</Row>
+									);
+								})}
+							</>
+						) : null}
+
+						<div
+							className={Classes.DIALOG_FOOTER_ACTIONS}
+							style={{ marginTop: '20px' }}
+						>
+							<Button
+								intent={Intent.DANGER}
+								disabled={loading}
+								onClick={() => {
+									this.setState({
+										needToConfirm: false,
+									});
+								}}
+								text={Strings.CLOSE}
+							/>
+							<Button
+								intent={Intent.PRIMARY}
+								disabled={loading}
+								onClick={this.confirmInstallOrUpdate}
+								text={Strings.OK}
+							/>
+						</div>
+					</div>
+				</Overlay>
 				<Row gutter={[20, 6]}>
 					<Col span={14}>
 						<H2>{Strings.MY_COURSES}</H2>

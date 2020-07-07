@@ -113,6 +113,9 @@ const english: Strings = {
 	FIRST_NAME_PROFILE: 'First Name',
 	LAST_NAME_PROFILE: 'Last Name',
 	PASSWORD_LENGTH: 'Password must contain 5-15 characters',
+	SOFTWARE_NEED_TO_INSTALL: 'Software to install',
+	SOFTWARE_NEED_TO_REMOVE: 'Software to remove',
+	NOTHING_TO_INSTALL_OR_REMOVE: 'Nothing to install or remove',
 };
 
 export default english;
