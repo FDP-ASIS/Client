@@ -106,6 +106,13 @@ export interface Strings {
 	CONFIRM_PASSWORD: string;
 	PROJECT_STORY: string;
 	PASSWORD_CHANGED: string;
+	PASSWORD_NOT_MATCHED: string;
+	FILL_ALL_FIELDS: string;
+	WRONG_CURRENT_PASSWORD: string;
+	PASSWORD_TOO_SHORT: string;
+	FIRST_NAME_PROFILE: string;
+	LAST_NAME_PROFILE: string;
+	PASSWORD_LENGTH: string;
 }
 
 enum Languages {

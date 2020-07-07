@@ -106,6 +106,13 @@ const english: Strings = {
 	CONFIRM_PASSWORD: 'Confirm password',
 	PROJECT_STORY: 'Project story',
 	PASSWORD_CHANGED: 'Your password has been changed',
+	PASSWORD_NOT_MATCHED: 'Your new password does not matched',
+	FILL_ALL_FIELDS: 'Please fill all fields',
+	WRONG_CURRENT_PASSWORD: 'Wrong current password',
+	PASSWORD_TOO_SHORT: 'New password too short',
+	FIRST_NAME_PROFILE: 'First Name',
+	LAST_NAME_PROFILE: 'Last Name',
+	PASSWORD_LENGTH: 'Password must contain 5-15 characters',
 };
 
 export default english;
