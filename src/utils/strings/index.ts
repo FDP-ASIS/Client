@@ -99,7 +99,6 @@ export interface Strings {
 	SOFTWARE_NEED_TO_REMOVE: string;
 	NOTHING_TO_INSTALL_OR_REMOVE: string;
 	MY_PROFILE: string;
-	EDIT_PROFILE: string;
 	CHANGE_PASSWORD: string;
 	CURRENT_PASSWORD: string;
 	SET_NEW_PASSWORD: string;
@@ -113,6 +112,7 @@ export interface Strings {
 	FIRST_NAME_PROFILE: string;
 	LAST_NAME_PROFILE: string;
 	PASSWORD_LENGTH: string;
+	EDIT_PASSWORD: string;
 }
 
 enum Languages {

@@ -473,7 +473,7 @@ class Profile extends React.Component<Props, State> {
 									rightIcon={'edit'}
 									fill
 									disabled={loading}
-									text={Strings.EDIT_PROFILE}
+									text={Strings.EDIT_PASSWORD}
 									onClick={() =>
 										this.setState({
 											OverlayIsOpen: true,

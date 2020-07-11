@@ -99,7 +99,7 @@ const english: Strings = {
 	NOTHING_TO_INSTALL_OR_REMOVE: 'Nothing to install or remove',
 	REMOVE: 'Remove',
 	MY_PROFILE: 'My Profile',
-	EDIT_PROFILE: 'Edit Profile',
+	EDIT_PASSWORD: 'Edit Password',
 	CHANGE_PASSWORD: 'Change password',
 	CURRENT_PASSWORD: 'Current password',
 	SET_NEW_PASSWORD: 'New password',
