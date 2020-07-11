@@ -12,6 +12,8 @@ export class UserApi extends Api {
 	private readonly BASE_AUTH = 'auth';
 	private readonly ADMIN_BASE = `${this.BASE}/admin`;
 
+	private readonly UPDATE_PASSWORD = `${this.BASE}/`; //{id}
+
 	private readonly LOGIN = `${this.BASE_AUTH}/login`;
 	private readonly LOGOUT = `${this.BASE_AUTH}/logout`;
 	private readonly AUTH_WITH_TOKEN = this.BASE_AUTH;
@@ -45,6 +47,7 @@ export class UserApi extends Api {
 		this.deleteUsers = this.deleteUsers.bind(this);
 		this.deleteUser = this.deleteUser.bind(this);
 		this.updateUser = this.updateUser.bind(this);
+		this.updatePassword = this.updatePassword.bind(this);
 
 		// this.userRegister = this.userRegister.bind(this);
 		// this.getAllUsers = this.getAllUsers.bind(this);
@@ -90,6 +93,13 @@ export class UserApi extends Api {
 	public updateUser(id: string, user: User) {
 		user.name = JSON.parse(user.name.toJsonString());
 		return this.put(this.UPDATE_USER + id, JSON.parse(user.toJsonString()));
+	}
+
+	public updatePassword(id: string, currentPassword: string, newPassword: string) {
+		return this.patch(this.UPDATE_PASSWORD + id, {
+			oldPassword: currentPassword,
+			newPassword: newPassword,
+		});
 	}
 
 	// public userRegister(user: User): Promise<number> {
