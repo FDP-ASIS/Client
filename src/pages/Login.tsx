@@ -102,7 +102,7 @@ class Login extends Component<RouteComponentProps & LoginComponentProps, LoginPr
 			>
 				<Button
 					disabled={disabled}
-					icon={showPassword ? 'unlock' : 'lock'}
+					icon={showPassword ? 'eye-open' : 'eye-off'}
 					intent={Intent.WARNING}
 					minimal={true}
 					onClick={this.handleLockClick}
