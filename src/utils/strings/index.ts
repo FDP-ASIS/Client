@@ -113,6 +113,7 @@ export interface Strings {
 	LAST_NAME_PROFILE: string;
 	PASSWORD_LENGTH: string;
 	EDIT_PASSWORD: string;
+	SUPPORT: string;
 }
 
 enum Languages {

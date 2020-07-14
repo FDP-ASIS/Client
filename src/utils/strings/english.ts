@@ -113,6 +113,7 @@ const english: Strings = {
 	FIRST_NAME_PROFILE: 'First Name',
 	LAST_NAME_PROFILE: 'Last Name',
 	PASSWORD_LENGTH: 'Password must contain 5-15 characters',
+	SUPPORT: 'Support',
 };
 
 export default english;
