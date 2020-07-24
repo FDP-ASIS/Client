@@ -16,7 +16,7 @@ class MySoftware {
 	}
 
 	/**
-	 * Getter _meedToInstallSoftware
+	 * Getter _needToInstallSoftware
 	 * @return {Software[]}
 	 */
 	public get needToInstallSoftware(): Software[] {
@@ -32,7 +32,7 @@ class MySoftware {
 	}
 
 	/**
-	 * Setter _meedToInstallSoftware
+	 * Setter _needToInstallSoftware
 	 * @param {Software[]} value
 	 */
 	public set needToInstallSoftware(value: Software[]) {
@@ -49,7 +49,7 @@ class MySoftware {
 }
 
 export const getNeedToInstallSoftware = async (currentCourses: Course[]): Promise<MySoftware> => {
-	const meedToInstallSoftware: Software[] = [];
+	const needToInstallSoftware: Software[] = [];
 	const needToRemoveSoftware: Software[] = [];
 	const needToRemoveSoftwareId: string[] = [];
 
@@ -59,18 +59,18 @@ export const getNeedToInstallSoftware = async (currentCourses: Course[]): Promis
 
 	currentCourses.forEach((c) =>
 		c.software.forEach((s) => {
-			if (meedToInstallSoftware.findIndex((myS) => myS.id === s.id) === -1) {
-				meedToInstallSoftware.push(s);
+			if (needToInstallSoftware.findIndex((myS) => myS.id === s.id) === -1) {
+				needToInstallSoftware.push(s);
 			}
 		})
 	);
 
 	mySoftwareIds.forEach((s) => {
-		const meedToInstallSoftwareIndex = meedToInstallSoftware.findIndex(
+		const needToInstallSoftwareIndex = needToInstallSoftware.findIndex(
 			(needToIns) => needToIns.id === s
 		);
-		if (meedToInstallSoftwareIndex >= 0)
-			meedToInstallSoftware.slice(meedToInstallSoftwareIndex, 1);
+		if (needToInstallSoftwareIndex >= 0)
+			needToInstallSoftware.slice(needToInstallSoftwareIndex, 1);
 		else needToRemoveSoftwareId.push(s);
 	});
 
@@ -78,11 +78,11 @@ export const getNeedToInstallSoftware = async (currentCourses: Course[]): Promis
 		const s = await softwareApi.getSoftware(id);
 		needToRemoveSoftware.push(s);
 	}
-	return new MySoftware(meedToInstallSoftware, needToRemoveSoftware);
+	return new MySoftware(needToInstallSoftware, needToRemoveSoftware);
 };
 
 export const installSoftware = async (courses: Course[]) => {
-	const meedToInstallSoftware: Software[] = [];
+	const needToInstallSoftware: Software[] = [];
 	const needToRemoveSoftwareId: string[] = [];
 
 	const { mySoftwareIds } = await ipc.send<{ mySoftwareIds: string[] }, {}>(
@@ -91,14 +91,14 @@ export const installSoftware = async (courses: Course[]) => {
 
 	courses.forEach((c) =>
 		c.software.forEach((s) => {
-			if (meedToInstallSoftware.findIndex((myS) => myS.id === s.id) === -1) {
-				meedToInstallSoftware.push(s);
+			if (needToInstallSoftware.findIndex((myS) => myS.id === s.id) === -1) {
+				needToInstallSoftware.push(s);
 			}
 		})
 	);
 
 	mySoftwareIds.forEach((s) => {
-		if (meedToInstallSoftware.findIndex((needToIns) => needToIns.id === s) === -1)
+		if (needToInstallSoftware.findIndex((needToIns) => needToIns.id === s) === -1)
 			needToRemoveSoftwareId.push(s);
 	});
 
@@ -112,7 +112,7 @@ export const installSoftware = async (courses: Course[]) => {
 		});
 	});
 
-	meedToInstallSoftware.forEach((s) => {
+	needToInstallSoftware.forEach((s) => {
 		softwareApi.getScript(s.name, s.version, ScriptType.INSTALLATION).then((url) => {
 			ipc.send<{}, { url: string; id: string }>(SoftwareChannels.Installation, {
 				params: { url, id: s.id },

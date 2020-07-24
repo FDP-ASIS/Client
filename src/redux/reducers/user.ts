@@ -11,15 +11,16 @@ const initialState: UserState = {
 	user: null,
 };
 
+/*
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 	initialState.user = new User(
-		'123456780',
-		new Name('first', 'last'),
-		'username',
-		'mail@mail.com',
+		'123456789',
+		new Name('Israel', 'Israeli'),
+		'Student',
+		'student@gmail.com',
 		Role.STUDENT
 	);
-}
+}*/
 // else {
 // 	// production code
 // }

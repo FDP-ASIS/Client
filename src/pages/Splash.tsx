@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import ReactLoading from 'react-loading';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-
 import logo from '../assets/logo.png';
-
 import { getAuthToken, logMeInWithToken } from '../utils/auth';
 import { RoutesPath } from '../routers/routesPath';
 import { connect } from 'react-redux';
