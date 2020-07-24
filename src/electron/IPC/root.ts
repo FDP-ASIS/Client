@@ -6,7 +6,7 @@ import {
 	RemoveAuthTokenChannel,
 } from './main/authChannel';
 
-import { ReadDepartmentCSVChannel, ReadCourseCSVChannel, ReadUserCSVChannel } from './main/readCSV';
+import { ReadCourseCSVChannel, ReadUserCSVChannel } from './main/readCSV';
 import {
 	InstallSoftwareChannel,
 	DeletionSoftwareChannel,
@@ -21,7 +21,6 @@ const ipcsClasses: ClassType<any>[] = [
 	GetAuthTokenChannel,
 	SetAuthTokenChannel,
 	RemoveAuthTokenChannel,
-	ReadDepartmentCSVChannel,
 	ReadCourseCSVChannel,
 	ReadUserCSVChannel,
 	InstallSoftwareChannel,
