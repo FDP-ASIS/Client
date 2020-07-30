@@ -1,4 +1,5 @@
-**Automatic Software Installation System** is a standard academic final degree project in software engineering. <br />
+# Automatic Software Installation System 
+A standard academic final degree project in software engineering. <br />
 It was created for "Afeka College (Tel Aviv Academic College of Engineering)" which makes the software installation process in the various 
 courses a fully automated, non-contact process.
 This documentation is only for the client-side of the project. <br />
