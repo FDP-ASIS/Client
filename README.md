@@ -28,8 +28,11 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.<br />
 Your app is ready to be deployed! <br />
 
-[Detailed explanations about the client](https://finalprojectafeka2020.gitbook.io/client/) <br />
+**Want to know more about our project? We created a gitBook for you:** <br /> 
+[Detailed explanations about the client- GitBook Site](https://finalprojectafeka2020.gitbook.io/client/) <br />
+[Detailed explanations about the client- GitBook PDF](https://drive.google.com/file/d/1Iv_zfnPbDKWY1YWM9I61efJ9wYGn19lO/view?usp=sharing) <br />
 
-[Demo-Video](https://drive.google.com/file/d/1XfkoofzGbJ2oG1Il8I-Q5XHSP7zRjxoQ/view?usp=sharing) <br />
+**Want to see how it all works?** <br /> 
+Press Here: [Demo-Video](https://drive.google.com/file/d/1XfkoofzGbJ2oG1Il8I-Q5XHSP7zRjxoQ/view?usp=sharing) <br />
 
-![alt text](https://github.com/FDP-ASIS/Client/blob/master/public/logo512.png) <br />
+![alt text](https://github.com/FDP-ASIS/Client/blob/master/public/logo512.png)
